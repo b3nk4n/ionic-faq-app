@@ -1,0 +1,7 @@
+{
+  "name": "ionic-faq-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
