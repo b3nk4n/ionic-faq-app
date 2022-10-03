@@ -1,6 +1,7 @@
 {
-  "short_name": "Ionic App",
-  "name": "My Ionic App",
+  "short_name": "FAQ App",
+  "name": "Ionic FAQ App",
+  "description": "An FAQ app using Ionic",
   "icons": [
     {
       "src": "assets/icon/favicon.png",
@@ -11,11 +12,11 @@
       "src": "assets/icon/icon.png",
       "type": "image/png",
       "sizes": "512x512",
-      "purpose": "maskable"
+      "purpose": "any"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#ffffff",
+  "theme_color": "#8800d1",
   "background_color": "#ffffff"
 }
