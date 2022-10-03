@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { IonAlert, useIonLoading, useIonToast } from '@ionic/react';
+import { IonAlert, useIonLoading } from '@ionic/react';
 
 import * as serviceWorkerRegistration from '../serviceWorkerRegistration';
 
@@ -9,7 +9,6 @@ let serviceWorker: ServiceWorker | null;
 const AppUpdater: React.FC = () => {
     const [ showUpdate, setShowUpdate ] = useState(false);
     const [ showLoading, dismissLoading ] = useIonLoading();
-    const [ showToast ] = useIonToast();
 
     const onServiceWorkerUpdate = (registration: ServiceWorkerRegistration) => {
         setShowUpdate(true);
@@ -17,7 +16,7 @@ const AppUpdater: React.FC = () => {
     };
     
     const onServiceWorkerSuccess = () => {
-        showToast('App installed as a PWA.', 3000);
+        console.log('App installed as a PWA.');
     };
 
     const updateServiceWorker = () => {
