@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Redirect, Route } from 'react-router-dom';
 import { IonApp, IonLoading, IonRouterOutlet, setupIonicReact } from '@ionic/react';
-import { User, onAuthStateChanged } from 'firebase/auth';
 import { IonReactRouter } from '@ionic/react-router';
+import { onAuthStateChanged } from 'firebase/auth';
 import AppUpdater from './components/AppUpdater';
 import { AuthContext } from './context/auth';
 import { auth } from './firebaseConfig';
+import Register from './pages/Register';
+import NotFound from './pages/NotFound';
 import Login from './pages/Login';
 import Home from './pages/Home';
 
@@ -54,11 +56,17 @@ const App: React.FC = () => {
               <Route exact path="/login">
                 <Login />
               </Route>
+              <Route exact path="/login/register">
+                <Register />
+              </Route>
               <Route exact path="/home">
                 <Home />
               </Route>
               <Route exact path="/">
                 <Redirect to="/home" />
+              </Route>
+              <Route>
+                <NotFound />
               </Route>
             </IonRouterOutlet>
           </IonReactRouter>

@@ -1,15 +1,15 @@
 import { useState } from 'react';
 
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonIcon, IonButton, IonList, IonItem, IonLabel, IonInput, IonText, IonLoading } from '@ionic/react';
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonIcon, IonButton, IonList, IonItem, IonLabel, IonInput, IonText, IonLoading, IonButtons, IonBackButton } from '@ionic/react';
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useAuth } from '../context/auth';
 import { auth } from '../firebaseConfig';
 import { Redirect } from 'react-router';
 import { logIn } from 'ionicons/icons';
 
-import './Login.css';
+import './Register.css';
 
-const Login: React.FC = () => {
+const Register: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [status, setStatus] = useState({ loading: false, error: false });
@@ -19,11 +19,11 @@ const Login: React.FC = () => {
     return <Redirect to="/home" />;
   }
 
-  const handleLogin = async () => {
+  const handleRegister = async () => {
     setStatus({ loading: true, error: false });
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       setStatus({ loading: false, error: false });
       console.log({userCredential});
     } catch (error) {
@@ -36,7 +36,10 @@ const Login: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar color="primary">
-          <IonTitle>Login</IonTitle>
+          <IonButtons slot="start">
+            <IonBackButton />
+          </IonButtons>
+          <IonTitle>Register</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen className='ion-padding'>
@@ -50,22 +53,17 @@ const Login: React.FC = () => {
             <IonInput type="password" value={password} onIonChange={e => setPassword(e.detail.value ?? '')} />
           </IonItem>
         </IonList>
+        {status.error && <IonText color="danger">Registration failed.</IonText>}
 
-        {status.error && <IonText color="danger">Invalid user or password.</IonText>}
-
-        <IonButton expand="block" onClick={handleLogin}>
+        <IonButton expand="block" onClick={handleRegister}>
           <IonIcon slot="start" icon={logIn} />
-          Email Login
+          Create Account
         </IonButton>
-
-        <IonButton expand="block" fill="clear" routerLink="/login/register">
-          Don't have an account?
-        </IonButton>
-
         <IonLoading isOpen={status.loading} />
+
       </IonContent>
     </IonPage>
   );
 };
 
-export default Login;
+export default Register;
