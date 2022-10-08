@@ -6,15 +6,18 @@ import { auth } from '../firebaseConfig';
 import { logIn } from 'ionicons/icons';
 
 import './Login.css';
+import { useAuth } from '../context/auth';
+import { Redirect } from 'react-router';
 
-interface Props {
-  onLogin: (user: User) => void;
-}
-
-const Login: React.FC<Props> = ({ onLogin }: Props) => {
+const Login: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [status, setStatus] = useState({ loading: false, error: false });
+  const { loggedIn } = useAuth();
+
+  if (loggedIn) {
+    return <Redirect to="/home" />;
+  }
 
   const handleLogin = async () => {
     setStatus({ loading: true, error: false });
@@ -23,7 +26,6 @@ const Login: React.FC<Props> = ({ onLogin }: Props) => {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       setStatus({ loading: false, error: false });
       console.log({userCredential});
-      onLogin(userCredential.user);
     } catch (error) {
       console.log({error});
       setStatus({ loading: false, error: true });

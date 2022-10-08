@@ -1,8 +1,10 @@
 import { Redirect } from 'react-router';
-import { getPlatforms, IonContent, IonHeader, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { getPlatforms, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonPopover, IonTitle, IonToolbar } from '@ionic/react';
 import { useAuth } from '../context/auth';
+import { auth } from '../firebaseConfig';
 
 import './Home.css';
+import { ellipsisHorizontal, ellipsisVertical } from 'ionicons/icons';
 
 const Home: React.FC = () => {
   const { loggedIn } = useAuth();
@@ -16,6 +18,20 @@ const Home: React.FC = () => {
       <IonHeader>
         <IonToolbar color="primary">
           <IonTitle>Home</IonTitle>
+          <IonButtons slot="end">
+            <IonButton id="open-popover-menu">
+              <IonIcon slot="icon-only" ios={ellipsisHorizontal} md={ellipsisVertical} />
+            </IonButton>
+            <IonPopover trigger="open-popover-menu" triggerAction="click" dismissOnSelect>
+              <IonContent>
+                <IonList>
+                  <IonItem button detail={false} onClick={() => auth.signOut()}>
+                    Logout
+                  </IonItem>
+                </IonList>
+              </IonContent>
+            </IonPopover>
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
