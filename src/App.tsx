@@ -1,7 +1,11 @@
+import { useState } from 'react';
 import { Redirect, Route } from 'react-router-dom';
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
 import AppUpdater from './components/AppUpdater';
+import { AuthContext } from './context/auth';
+import { User } from 'firebase/auth';
+import Login from './pages/Login';
 import Home from './pages/Home';
 
 /* Core CSS required for Ionic components to work properly */
@@ -25,22 +29,36 @@ import './theme/variables.css';
 
 setupIonicReact();
 
-const App: React.FC = () => (
-  <>
-    <AppUpdater />
-    <IonApp>
-      <IonReactRouter>
-        <IonRouterOutlet>
-          <Route exact path="/home">
-            <Home />
-          </Route>
-          <Route exact path="/">
-            <Redirect to="/home" />
-          </Route>
-        </IonRouterOutlet>
-      </IonReactRouter>
-    </IonApp>
-  </>
-);
+const App: React.FC = () => {
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  const onLogin = (user: User) => {
+    console.log(`User logged in: ${user.uid}`);
+    setLoggedIn(true);
+  }
+
+  return (
+    <>
+      <AppUpdater />
+      <IonApp>
+        <AuthContext.Provider value={{ loggedIn }}>
+          <IonReactRouter>
+            <IonRouterOutlet>
+              <Route exact path="/login">
+                {loggedIn ? <Redirect to="/home" /> : <Login onLogin={onLogin} />}
+              </Route>
+              <Route exact path="/home">
+                <Home />
+              </Route>
+              <Route exact path="/">
+                <Redirect to="/home" />
+              </Route>
+            </IonRouterOutlet>
+          </IonReactRouter>
+        </AuthContext.Provider>
+      </IonApp>
+    </>
+  );
+}
 
 export default App;

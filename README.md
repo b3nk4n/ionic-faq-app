@@ -15,7 +15,9 @@ Check out the app: https://ionic-faq-app.web.app
 
 ### Getting started
 
-To run the app in your web browser, simply run the following command in your terminal:
+First, create an `.env` file in the root folder and set the appropriate `REACT_APP_FIREBASE_API_KEY` from the Firebase console.
+
+Next, to run the app in your web browser, simply run the following command in your terminal:
 
 ```
 ionic serve

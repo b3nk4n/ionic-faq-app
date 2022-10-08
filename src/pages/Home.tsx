@@ -1,8 +1,16 @@
+import { Redirect } from 'react-router';
 import { getPlatforms, IonContent, IonHeader, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { useAuth } from '../context/auth';
 
 import './Home.css';
 
 const Home: React.FC = () => {
+  const { loggedIn } = useAuth();
+
+  if (!loggedIn) {
+    return <Redirect to="/login" />;
+  }
+
   return (
     <IonPage>
       <IonHeader>
