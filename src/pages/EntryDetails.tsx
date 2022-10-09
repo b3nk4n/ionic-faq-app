@@ -1,7 +1,7 @@
 import { useParams } from 'react-router';
 import { useEffect, useState } from 'react';
 
-import { IonBackButton, IonButtons, IonContent, IonHeader, IonLoading, IonPage, IonTitle, IonToolbar, useIonLoading } from '@ionic/react';
+import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar, useIonLoading } from '@ionic/react';
 import { doc, getDoc } from 'firebase/firestore';
 import { Entry } from '../types/model';
 import { db } from '../firebaseConfig';
@@ -13,6 +13,7 @@ interface RouteParams {
 }
 
 const EntryDetails: React.FC = () => {
+
     const { id } = useParams<RouteParams>();
     const [ entry, setEntry ] = useState<Entry>();
     const [showLoading, dismissLoading] = useIonLoading();

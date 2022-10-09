@@ -1,17 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Redirect } from 'react-router';
 
 import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonPopover, IonText, IonTitle, IonToolbar, useIonLoading } from '@ionic/react';
 import { ellipsisHorizontal, ellipsisVertical } from 'ionicons/icons';
 import { collection, getDocs } from 'firebase/firestore'; 
 import { auth, db } from '../firebaseConfig';
-import { useAuth } from '../context/auth';
 import { Entry } from '../types/model';
 
 import './Home.css';
 
 const Home: React.FC = () => {
-  const { loggedIn } = useAuth();
   const [entries, setEntries] = useState<Entry[]>([]);
   const [showLoading, dismissLoading] = useIonLoading();
 
@@ -30,10 +27,6 @@ const Home: React.FC = () => {
     };
     loadData();
   }, []);
-
-  if (!loggedIn) {
-    return <Redirect to="/login" />;
-  }
 
   return (
     <IonPage>

@@ -1,5 +1,5 @@
 import { Redirect, Route } from 'react-router-dom';
-import { IonApp, IonContent, IonRouterOutlet, IonSpinner, setupIonicReact } from '@ionic/react';
+import { IonApp, IonRouterOutlet, IonSpinner, setupIonicReact } from '@ionic/react';
 import { AuthContext, useAuthInit } from './context/auth';
 import { IonReactRouter } from '@ionic/react-router';
 import AppUpdater from './components/AppUpdater';
@@ -43,6 +43,7 @@ const App: React.FC = () => {
     );
   }
 
+  const { loggedIn } = auth;
   return (
     <IonApp>
       <AppUpdater />
@@ -53,13 +54,13 @@ const App: React.FC = () => {
               <Login />
             </Route>
             <Route exact path="/login/register">
-              <Register />
+              {loggedIn ? <Redirect to="/home" /> : <Register />}
             </Route>
             <Route exact path="/home">
-              <Home />
+              {loggedIn ? <Home /> : <Redirect to="/login" />}
             </Route>
             <Route exact path="/entries/:id">
-              <EntryDetails />
+              {loggedIn ? <EntryDetails /> : <Redirect to="/login" />}
             </Route>
             <Route exact path="/">
               <Redirect to="/home" />

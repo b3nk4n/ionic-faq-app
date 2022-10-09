@@ -2,9 +2,7 @@ import { useState } from 'react';
 
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonIcon, IonButton, IonList, IonItem, IonLabel, IonInput, IonText, IonLoading, IonButtons, IonBackButton } from '@ionic/react';
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { useAuth } from '../context/auth';
 import { auth } from '../firebaseConfig';
-import { Redirect } from 'react-router';
 import { logIn } from 'ionicons/icons';
 
 import './Register.css';
@@ -13,11 +11,6 @@ const Register: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [status, setStatus] = useState({ loading: false, error: false });
-  const { loggedIn } = useAuth();
-
-  if (loggedIn) {
-    return <Redirect to="/home" />;
-  }
 
   const handleRegister = async () => {
     setStatus({ loading: true, error: false });

@@ -1,7 +1,4 @@
-import { Redirect } from 'react-router';
-import { getPlatforms, IonButton, IonButtons, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonPopover, IonRow, IonText, IonTitle, IonToolbar } from '@ionic/react';
-import { useAuth } from '../context/auth';
-import { auth } from '../firebaseConfig';
+import { IonCol, IonContent, IonGrid, IonHeader, IonLabel, IonPage, IonRow, IonTitle, IonToolbar } from '@ionic/react';
 
 import './NotFound.css';
 
