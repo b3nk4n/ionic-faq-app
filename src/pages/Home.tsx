@@ -1,13 +1,35 @@
+import { useEffect, useState } from 'react';
 import { Redirect } from 'react-router';
-import { getPlatforms, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonPopover, IonTitle, IonToolbar } from '@ionic/react';
+
+import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonPopover, IonText, IonTitle, IonToolbar, useIonLoading } from '@ionic/react';
+import { ellipsisHorizontal, ellipsisVertical } from 'ionicons/icons';
+import { collection, getDocs } from 'firebase/firestore'; 
+import { auth, db } from '../firebaseConfig';
 import { useAuth } from '../context/auth';
-import { auth } from '../firebaseConfig';
+import { Entry } from '../types/model';
 
 import './Home.css';
-import { ellipsisHorizontal, ellipsisVertical } from 'ionicons/icons';
 
 const Home: React.FC = () => {
   const { loggedIn } = useAuth();
+  const [entries, setEntries] = useState<Entry[]>([]);
+  const [showLoading, dismissLoading] = useIonLoading();
+
+  useEffect(() => {
+    const loadData = async () => {
+      await showLoading('Loading entries...');
+      const querySnapshot = await getDocs(collection(db, 'entries'));
+
+      // TODO You can also use the "get" method to retrieve the entire collection.
+      const entries = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      } as Entry));
+      await dismissLoading();
+      setEntries(entries);
+    };
+    loadData();
+  }, []);
 
   if (!loggedIn) {
     return <Redirect to="/login" />;
@@ -42,12 +64,17 @@ const Home: React.FC = () => {
         </IonHeader>
 
         <IonListHeader>
-          <IonLabel>Detected Platforms</IonLabel>
+          <IonLabel>Entries</IonLabel>
         </IonListHeader>
         <IonList>
-          {getPlatforms().map(platform => (
-            <IonItem key={platform}>
-              <IonLabel>{platform}</IonLabel>
+          {entries.map(entry => (
+            <IonItem key={entry.id} routerLink={`/entries/${entry.id}`}>
+              <IonText>
+              <h3><IonText color="primary">{entry.title}</IonText></h3>
+                <p>
+                  {entry.content}
+                </p>
+              </IonText>
             </IonItem>
           ))}
         </IonList>

@@ -1,8 +1,9 @@
 import { Redirect, Route } from 'react-router-dom';
-import { IonApp, IonLoading, IonRouterOutlet, setupIonicReact } from '@ionic/react';
+import { IonApp, IonContent, IonRouterOutlet, IonSpinner, setupIonicReact } from '@ionic/react';
 import { AuthContext, useAuthInit } from './context/auth';
 import { IonReactRouter } from '@ionic/react-router';
 import AppUpdater from './components/AppUpdater';
+import EntryDetails from './pages/EntryDetails';
 import Register from './pages/Register';
 import NotFound from './pages/NotFound';
 import Login from './pages/Login';
@@ -33,36 +34,43 @@ const App: React.FC = () => {
   const { loading, auth } = useAuthInit();
 
   if (loading || !auth) {
-    return <IonLoading isOpen />;
+    return (
+      <IonApp>
+        <div style={{display: "flex", justifyContent: "center", alignItems: "center", background: "white", height: "100%"}}>
+          <IonSpinner color="primary" name="dots" />
+        </div>
+      </IonApp>
+    );
   }
 
   return (
-    <>
+    <IonApp>
       <AppUpdater />
-      <IonApp>
-        <AuthContext.Provider value={auth}>
-          <IonReactRouter>
-            <IonRouterOutlet>
-              <Route exact path="/login">
-                <Login />
-              </Route>
-              <Route exact path="/login/register">
-                <Register />
-              </Route>
-              <Route exact path="/home">
-                <Home />
-              </Route>
-              <Route exact path="/">
-                <Redirect to="/home" />
-              </Route>
-              <Route>
-                <NotFound />
-              </Route>
-            </IonRouterOutlet>
-          </IonReactRouter>
-        </AuthContext.Provider>
-      </IonApp>
-    </>
+      <AuthContext.Provider value={auth!}>
+        <IonReactRouter>
+          <IonRouterOutlet>
+            <Route exact path="/login">
+              <Login />
+            </Route>
+            <Route exact path="/login/register">
+              <Register />
+            </Route>
+            <Route exact path="/home">
+              <Home />
+            </Route>
+            <Route exact path="/entries/:id">
+              <EntryDetails />
+            </Route>
+            <Route exact path="/">
+              <Redirect to="/home" />
+            </Route>
+            <Route>
+              <NotFound />
+            </Route>
+          </IonRouterOutlet>
+        </IonReactRouter>
+      </AuthContext.Provider>
+    </IonApp>
   );
 }
 
