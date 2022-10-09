@@ -4,6 +4,7 @@ import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonLabe
 import { ellipsisHorizontal, ellipsisVertical } from 'ionicons/icons';
 import { collection, getDocs } from 'firebase/firestore'; 
 import { auth, db } from '../firebaseConfig';
+import { toEntry } from '../types/mapper';
 import { Entry } from '../types/model';
 
 import './Home.css';
@@ -15,15 +16,12 @@ const Home: React.FC = () => {
   useEffect(() => {
     const loadData = async () => {
       await showLoading('Loading entries...');
-      const querySnapshot = await getDocs(collection(db, 'entries'));
 
-      // TODO You can also use the "get" method to retrieve the entire collection.
-      const entries = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      } as Entry));
-      await dismissLoading();
+      const querySnapshot = await getDocs(collection(db, 'entries'));
+      const entries = querySnapshot.docs.map(toEntry);
       setEntries(entries);
+
+      await dismissLoading();
     };
     loadData();
   }, []);

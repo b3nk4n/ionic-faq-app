@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { IonBackButton, IonButtons, IonContent, IonHeader, IonPage, IonTitle, IonToolbar, useIonLoading } from '@ionic/react';
 import { doc, getDoc } from 'firebase/firestore';
+import { toEntry } from '../types/mapper';
 import { Entry } from '../types/model';
 import { db } from '../firebaseConfig';
 
@@ -20,15 +21,14 @@ const EntryDetails: React.FC = () => {
 
     useEffect(() => {
         const loadEntry = async () => {
-            showLoading('Loading entry...');
+            await showLoading('Loading entry...');
+
             const docRef = doc(db, 'entries', id);
             const docSnapshot = await getDoc(docRef);
-            const entryData = {
-                id: docSnapshot.id,
-                ...docSnapshot.data()
-            } as Entry;
+            const entryData = toEntry(docSnapshot);
             setEntry(entryData);
-            dismissLoading();
+
+            await dismissLoading();
         };
         loadEntry();
     }, [id]);
