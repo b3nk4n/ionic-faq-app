@@ -25,7 +25,6 @@ const Register: React.FC = () => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       setStatus({ loading: false, error: false });
-      console.log({userCredential});
     } catch (error) {
       console.log({error});
       setStatus({ loading: false, error: true });

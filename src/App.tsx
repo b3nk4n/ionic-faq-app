@@ -1,11 +1,8 @@
-import { useState, useEffect } from 'react';
 import { Redirect, Route } from 'react-router-dom';
 import { IonApp, IonLoading, IonRouterOutlet, setupIonicReact } from '@ionic/react';
+import { AuthContext, useAuthInit } from './context/auth';
 import { IonReactRouter } from '@ionic/react-router';
-import { onAuthStateChanged } from 'firebase/auth';
 import AppUpdater from './components/AppUpdater';
-import { AuthContext } from './context/auth';
-import { auth } from './firebaseConfig';
 import Register from './pages/Register';
 import NotFound from './pages/NotFound';
 import Login from './pages/Login';
@@ -33,16 +30,9 @@ import './theme/variables.css';
 setupIonicReact();
 
 const App: React.FC = () => {
-  const [authState, setAuthState] = useState({ loading: true, loggedIn: false });
+  const { loading, auth } = useAuthInit();
 
-  useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      console.log({ user });
-      setAuthState({ loading: false, loggedIn: Boolean(user)});
-    })
-  }, []);
-
-  if (authState.loading) {
+  if (loading || !auth) {
     return <IonLoading isOpen />;
   }
 
@@ -50,7 +40,7 @@ const App: React.FC = () => {
     <>
       <AppUpdater />
       <IonApp>
-        <AuthContext.Provider value={{ loggedIn: authState.loggedIn }}>
+        <AuthContext.Provider value={auth}>
           <IonReactRouter>
             <IonRouterOutlet>
               <Route exact path="/login">
