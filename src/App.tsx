@@ -62,6 +62,9 @@ const App: React.FC = () => {
             <Route exact path="/entries/:id">
               {loggedIn ? <EntryDetails /> : <Redirect to="/login" />}
             </Route>
+            <Route exact path="/users/:userId/entries/:id">
+              {loggedIn ? <EntryDetails /> : <Redirect to="/login" />}
+            </Route>
             <Route exact path="/">
               <Redirect to="/home" />
             </Route>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonPage, IonPopover, IonText, IonTitle, IonToolbar, useIonLoading } from '@ionic/react';
+import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonPage, IonPopover, IonProgressBar, IonSegment, IonSegmentButton, IonText, IonTitle, IonToolbar } from '@ionic/react';
 import { ellipsisHorizontal, ellipsisVertical } from 'ionicons/icons';
 import { collection, getDocs } from 'firebase/firestore'; 
 import { auth, db } from '../firebaseConfig';
@@ -8,29 +8,40 @@ import { toEntry } from '../types/mapper';
 import { Entry } from '../types/model';
 
 import './Home.css';
+import { useAuth } from '../context/auth';
+
+type SegmentValue = 'public' | 'private';
 
 const Home: React.FC = () => {
+  const { userId } = useAuth();
   const [entries, setEntries] = useState<Entry[]>([]);
-  const [showLoading, dismissLoading] = useIonLoading();
+  const [loading, setLoading] = useState<boolean>(false);
+  const [segmentValue, setSegmentValue] = useState<SegmentValue>('public');
 
   useEffect(() => {
     const loadData = async () => {
-      await showLoading('Loading entries...');
+      setLoading(true);
+    
+      if (segmentValue === 'public') {
+        const entries = await fetchPublicEntries();
+        setEntries(entries);
+      } else if (segmentValue === 'private' && userId) {
+        const entries = await fetchPrivateEntries(userId);
+        setEntries(entries);
+      }
 
-      const querySnapshot = await getDocs(collection(db, 'entries'));
-      const entries = querySnapshot.docs.map(toEntry);
-      setEntries(entries);
-
-      await dismissLoading();
+      setLoading(false);
     };
+
     loadData();
-  }, []);
+  }, [segmentValue]);
 
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar color="primary">
           <IonTitle>Home</IonTitle>
+          {loading && <IonProgressBar type="indeterminate" color="light"></IonProgressBar>}
           <IonButtons slot="end">
             <IonButton id="open-popover-menu">
               <IonIcon slot="icon-only" ios={ellipsisHorizontal} md={ellipsisVertical} />
@@ -47,19 +58,20 @@ const Home: React.FC = () => {
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Home</IonTitle>
-          </IonToolbar>
-        </IonHeader>
 
-        <IonListHeader>
-          <IonLabel>Entries</IonLabel>
-        </IonListHeader>
+      <IonContent fullscreen>
+        <IonSegment value={segmentValue} onIonChange={e => setSegmentValue(e.detail.value as SegmentValue)}>
+          <IonSegmentButton value="public">
+            <IonLabel>Public</IonLabel>
+          </IonSegmentButton>
+          <IonSegmentButton value="private">
+            <IonLabel>Private</IonLabel>
+          </IonSegmentButton>
+        </IonSegment>
+
         <IonList>
           {entries.map(entry => (
-            <IonItem key={entry.id} routerLink={`/entries/${entry.id}`}>
+            <IonItem key={entry.id} routerLink={getDetailsLink(segmentValue, entry.id, userId)} detail>
               <IonText>
               <h3><IonText color="primary">{entry.title}</IonText></h3>
                 <p>
@@ -69,10 +81,31 @@ const Home: React.FC = () => {
             </IonItem>
           ))}
         </IonList>
-
       </IonContent>
     </IonPage>
   );
 };
+
+function getDetailsLink(segmentValue: SegmentValue, id: string, userId?: string): string {
+  if (segmentValue === 'public') {
+    return `/entries/${id}`;
+  }
+  if (segmentValue === 'private' && userId) {
+    return `/users/${userId}/entries/${id}`;
+  }
+  return '/';
+}
+
+async function fetchPublicEntries() {
+  // TODO const allPosts = await getDocs(collectionGroup(db, "posts")) as a better way to get docs across users? For the Admin user.
+
+  const querySnapshot = await getDocs(collection(db, 'entries'));
+  return querySnapshot.docs.map(toEntry);
+}
+
+async function fetchPrivateEntries(userId: string) {
+  const querySnapshot = await getDocs(collection(db, 'users', userId, 'entries'));
+  return querySnapshot.docs.map(toEntry);
+}
 
 export default Home;

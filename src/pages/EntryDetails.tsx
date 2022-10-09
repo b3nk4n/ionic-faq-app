@@ -11,11 +11,12 @@ import './EntryDetails.css';
 
 interface RouteParams {
     id: string;
+    userId?: string;
 }
 
 const EntryDetails: React.FC = () => {
 
-    const { id } = useParams<RouteParams>();
+    const { id, userId } = useParams<RouteParams>();
     const [ entry, setEntry ] = useState<Entry>();
     const [showLoading, dismissLoading] = useIonLoading();
 
@@ -23,7 +24,9 @@ const EntryDetails: React.FC = () => {
         const loadEntry = async () => {
             await showLoading('Loading entry...');
 
-            const docRef = doc(db, 'entries', id);
+            const docRef = userId
+                ? doc(db, 'users', userId, 'entries', id)
+                : doc(db, 'entries', id);
             const docSnapshot = await getDoc(docRef);
             const entryData = toEntry(docSnapshot);
             setEntry(entryData);
