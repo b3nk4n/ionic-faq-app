@@ -2,18 +2,19 @@ import { useEffect, useState } from 'react';
 
 import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonPage, IonPopover, IonProgressBar, IonSegment, IonSegmentButton, IonText, IonTitle, IonToolbar } from '@ionic/react';
 import { ellipsisHorizontal, ellipsisVertical } from 'ionicons/icons';
+import { GoogleAuthProvider, linkWithRedirect } from 'firebase/auth';
 import { collection, getDocs } from 'firebase/firestore'; 
 import { auth, db } from '../firebaseConfig';
 import { toEntry } from '../types/mapper';
+import { useAuth } from '../context/auth';
 import { Entry } from '../types/model';
 
 import './Home.css';
-import { useAuth } from '../context/auth';
 
 type SegmentValue = 'public' | 'private';
 
 const Home: React.FC = () => {
-  const { userId } = useAuth();
+  const { userId, anonymous } = useAuth();
   const [entries, setEntries] = useState<Entry[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [segmentValue, setSegmentValue] = useState<SegmentValue>('public');
@@ -36,6 +37,11 @@ const Home: React.FC = () => {
     loadData();
   }, [segmentValue]);
 
+  const continueAsGoogle = async () => {
+    const provider = new GoogleAuthProvider();
+    await linkWithRedirect(auth.currentUser!, provider);
+  }
+
   return (
     <IonPage>
       <IonHeader>
@@ -49,6 +55,11 @@ const Home: React.FC = () => {
             <IonPopover trigger="open-popover-menu" triggerAction="click" dismissOnSelect>
               <IonContent>
                 <IonList>
+                  {anonymous && (
+                    <IonItem button detail={false} onClick={continueAsGoogle}>
+                      Continue via Google Login
+                    </IonItem>
+                  )}
                   <IonItem button detail={false} onClick={() => auth.signOut()}>
                     Logout
                   </IonItem>

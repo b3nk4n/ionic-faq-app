@@ -1,4 +1,4 @@
-import { FacebookAuthProvider, getRedirectResult, onAuthStateChanged } from 'firebase/auth';
+import { getRedirectResult, GoogleAuthProvider, onAuthStateChanged, AuthErrorCodes } from 'firebase/auth';
 import React, { useContext, useEffect, useState } from 'react';
 import { auth as firebaseAuth } from '../firebaseConfig';
 
@@ -61,6 +61,17 @@ export const useAuthInit = (): AuthInit => {
             //             console.log({ errorCode, errorMessage, email, credential });
             //         });
             // }
+
+            if (user?.isAnonymous) {
+                getRedirectResult(firebaseAuth)
+                    .catch(error => {
+                        if (error?.code === AuthErrorCodes.CREDENTIAL_ALREADY_IN_USE) {
+                            console.error('The account cannot be converted because it already exists.');
+                        } else {
+                            console.error('Unhandled error: ' + error?.code);
+                        }
+                    });
+            }
             
             setAuthInit({ loading: false, auth: { loggedIn: Boolean(user), userId: user?.uid, anonymous: user?.isAnonymous }});
         })
