@@ -5,6 +5,7 @@ import { auth as firebaseAuth } from '../firebaseConfig';
 interface Auth {
     loggedIn: boolean;
     userId?: string;
+    anonymous?: boolean;
 }
 
 interface AuthInit {
@@ -26,6 +27,9 @@ export const useAuthInit = (): AuthInit => {
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(firebaseAuth, async (user) => {
             console.log({ user });
+
+            // TODO Handling account-exists-with-different-credential Errors
+            //      https://firebase.google.com/docs/auth/web/facebook-login#expandable-1
 
             // if (user) {
             //     getRedirectResult(firebaseAuth)
@@ -58,7 +62,7 @@ export const useAuthInit = (): AuthInit => {
             //         });
             // }
             
-            setAuthInit({ loading: false, auth: { loggedIn: Boolean(user), userId: user?.uid }});
+            setAuthInit({ loading: false, auth: { loggedIn: Boolean(user), userId: user?.uid, anonymous: user?.isAnonymous }});
         })
         return unsubscribe;
     }, []);
