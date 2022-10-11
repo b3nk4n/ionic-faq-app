@@ -1,11 +1,11 @@
 import { useState } from 'react';
 
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonIcon, IonButton, IonList, IonItem, IonLabel, IonInput, IonText, IonLoading } from '@ionic/react';
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { FacebookAuthProvider, signInWithEmailAndPassword, signInWithRedirect } from "firebase/auth";
+import { logIn, logoFacebook } from 'ionicons/icons';
 import { useAuth } from '../context/auth';
 import { auth } from '../firebaseConfig';
 import { Redirect } from 'react-router';
-import { logIn } from 'ionicons/icons';
 
 import './Login.css';
 
@@ -23,12 +23,19 @@ const Login: React.FC = () => {
     setStatus({ loading: true, error: false });
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, email, password);
       setStatus({ loading: false, error: false });
     } catch (error) {
       console.log({error});
       setStatus({ loading: false, error: true });
     }
+  };
+
+  const handleFacebookLogin = async () => {
+    setStatus({ loading: true, error: false });
+
+    const provider = new FacebookAuthProvider()
+    await signInWithRedirect(auth, provider);
   };
 
   return (
@@ -54,7 +61,11 @@ const Login: React.FC = () => {
 
         <IonButton expand="block" onClick={handleLogin}>
           <IonIcon slot="start" icon={logIn} />
-          Email Login
+          Login with Email
+        </IonButton>
+        <IonButton expand="block" color="secondary" onClick={handleFacebookLogin}>
+          <IonIcon slot="start" icon={logoFacebook} />
+          Login with Facebook
         </IonButton>
 
         <IonButton expand="block" fill="clear" routerLink="/login/register">
