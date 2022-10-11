@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonIcon, IonButton, IonList, IonItem, IonLabel, IonInput, IonText, IonLoading } from '@ionic/react';
-import { FacebookAuthProvider, signInWithEmailAndPassword, signInWithRedirect } from "firebase/auth";
-import { logIn, logoFacebook } from 'ionicons/icons';
+import { FacebookAuthProvider, GoogleAuthProvider, signInWithEmailAndPassword, signInWithRedirect } from "firebase/auth";
+import { logIn, logoFacebook, logoGoogle } from 'ionicons/icons';
 import { useAuth } from '../context/auth';
 import { auth } from '../firebaseConfig';
 import { Redirect } from 'react-router';
@@ -38,6 +38,16 @@ const Login: React.FC = () => {
     await signInWithRedirect(auth, provider);
   };
 
+  const handleGoogleLogin = async () => {
+    setStatus({ loading: true, error: false });
+
+    const provider = new GoogleAuthProvider()
+    provider.setCustomParameters({
+      'login_hint': 'user@example.com'
+    });
+    await signInWithRedirect(auth, provider);
+  };
+
   return (
     <IonPage>
       <IonHeader>
@@ -66,6 +76,10 @@ const Login: React.FC = () => {
         <IonButton expand="block" color="secondary" onClick={handleFacebookLogin}>
           <IonIcon slot="start" icon={logoFacebook} />
           Login with Facebook
+        </IonButton>
+        <IonButton expand="block" color="tertiary" onClick={handleGoogleLogin}>
+          <IonIcon slot="start" icon={logoGoogle} />
+          Login with Google
         </IonButton>
 
         <IonButton expand="block" fill="clear" routerLink="/login/register">
