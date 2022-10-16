@@ -1,13 +1,15 @@
 import { useState } from 'react';
 
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonIcon, IonButton, IonList, IonItem, IonLabel, IonInput, IonText, IonLoading, LoadingOptions } from '@ionic/react';
+import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonIcon, IonButton, IonList, IonItem, IonLabel, IonInput, IonText, IonLoading } from '@ionic/react';
 import { FacebookAuthProvider, GoogleAuthProvider, signInWithEmailAndPassword, signInWithRedirect, signInAnonymously } from "firebase/auth";
-import { mail, logIn, logoFacebook, logoGoogle } from 'ionicons/icons';
+import { mail, logIn, logoFacebook, logoGoogle, call } from 'ionicons/icons';
+import PhoneSignInModal from '../components/PhoneSignInModal';
 import { useAuth } from '../context/auth';
 import { auth } from '../firebaseConfig';
 import { Redirect } from 'react-router';
 
 import './Login.css';
+
 
 interface Status {
   loading: boolean;
@@ -18,9 +20,11 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [status, setStatus] = useState<Status>({ loading: false });
+  const [isPhoneSignInOpen, setIsPhoneSignInOpen] = useState<boolean>(false);
   const { loggedIn } = useAuth();
 
   if (loggedIn) {
+    forceCloseModals()
     return <Redirect to="/home" />;
   }
 
@@ -63,6 +67,10 @@ const Login: React.FC = () => {
     }
   };
 
+  const handlePhoneLogin = async () => {
+    setIsPhoneSignInOpen(true);
+  }
+
   return (
     <IonPage>
       <IonHeader>
@@ -96,21 +104,36 @@ const Login: React.FC = () => {
           <IonIcon slot="start" icon={logoGoogle} />
           Login with Google
         </IonButton>
+        <IonButton expand="block" color="success" onClick={handlePhoneLogin}>
+          <IonIcon slot="start" icon={call} />
+          <IonLabel>Login with Phone</IonLabel>
+        </IonButton>
         <IonButton expand="block" color="dark" onClick={handleGuestLogin}>
           <IonIcon slot="start" icon={logIn} />
           Login as Guest
         </IonButton>
 
-        {/* TODO Phone auth https://firebase.google.com/docs/auth/web/phone-auth  */}
-
         <IonButton expand="block" fill="clear" routerLink="/login/register">
           Don't have an account?
         </IonButton>
+
+        <PhoneSignInModal 
+          isOpen={isPhoneSignInOpen}
+          onLoginSuccess={(user) => setIsPhoneSignInOpen(false)}
+          onCancel= {() => setIsPhoneSignInOpen(false)}
+        />
 
         <IonLoading isOpen={status.loading} />
       </IonContent>
     </IonPage>
   );
 };
+
+function forceCloseModals(): void {
+  var modals = document.getElementsByTagName("ion-modal");
+  [].forEach.call(modals, function (el:any) {
+      el.parentNode.removeChild(el);
+  });
+}
 
 export default Login;

@@ -46,7 +46,7 @@ const App: React.FC = () => {
   const { loggedIn } = auth;
   return (
     <IonApp>
-      <AppUpdater />
+      <AppUpdater /> {/* TODO Fix that update dialog is not showing up anymore */}
       <AuthContext.Provider value={auth!}>
         <IonReactRouter>
           <IonRouterOutlet>
