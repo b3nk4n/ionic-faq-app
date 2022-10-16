@@ -6,6 +6,13 @@ import * as serviceWorkerRegistration from '../serviceWorkerRegistration';
 
 let serviceWorker: ServiceWorker | null;
 
+/**
+ * A simple to use PWA update dialog to inform a user a new version is available.
+ * 
+ * Please note that this component neets to be rendered right from the beginning,
+ * because otherwise the window.load event of the service-worker-registrations
+ * might be missed.
+ */
 const AppUpdater: React.FC = () => {
     const [ showUpdate, setShowUpdate ] = useState(false);
     const [ showLoading, dismissLoading ] = useIonLoading();
@@ -43,10 +50,6 @@ const AppUpdater: React.FC = () => {
             onSuccess: onServiceWorkerSuccess
         });
     }, []);
-
-    if (!showUpdate) {
-        return null;
-    }
 
     return (
         <IonAlert

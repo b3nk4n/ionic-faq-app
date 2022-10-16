@@ -24,7 +24,7 @@ const Login: React.FC = () => {
   const { loggedIn } = useAuth();
 
   if (loggedIn) {
-    forceCloseModals()
+    forceCloseModals();
     return <Redirect to="/home" />;
   }
 
@@ -96,6 +96,10 @@ const Login: React.FC = () => {
           <IonIcon slot="start" icon={mail} />
           Login with Email
         </IonButton>
+        <IonButton expand="block" fill="clear" routerLink="/login/register">
+          Don't have an account?
+        </IonButton>
+        
         <IonButton expand="block" color="secondary" onClick={handleFacebookLogin}>
           <IonIcon slot="start" icon={logoFacebook} />
           Login with Facebook
@@ -113,10 +117,6 @@ const Login: React.FC = () => {
           Login as Guest
         </IonButton>
 
-        <IonButton expand="block" fill="clear" routerLink="/login/register">
-          Don't have an account?
-        </IonButton>
-
         <PhoneSignInModal 
           isOpen={isPhoneSignInOpen}
           onLoginSuccess={(user) => setIsPhoneSignInOpen(false)}
@@ -132,6 +132,7 @@ const Login: React.FC = () => {
 function forceCloseModals(): void {
   var modals = document.getElementsByTagName("ion-modal");
   [].forEach.call(modals, function (el:any) {
+      console.log({forceClosedElement: el});
       el.parentNode.removeChild(el);
   });
 }

@@ -34,6 +34,8 @@ export function register(config?: Config) {
       return;
     }
 
+    // Please note that if the event listener is not registered in the first render cycle,
+    // then the window.load event will be missed!
     window.addEventListener('load', () => {
       const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
 

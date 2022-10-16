@@ -36,7 +36,8 @@ const App: React.FC = () => {
   if (loading || !auth) {
     return (
       <IonApp>
-        <div style={{display: "flex", justifyContent: "center", alignItems: "center", background: "white", height: "100%"}}>
+        <AppUpdater />
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", background: "white", height: "100%" }}>
           <IonSpinner color="primary" name="dots" />
         </div>
       </IonApp>
@@ -46,7 +47,7 @@ const App: React.FC = () => {
   const { loggedIn } = auth;
   return (
     <IonApp>
-      <AppUpdater /> {/* TODO Fix that update dialog is not showing up anymore */}
+      <AppUpdater />
       <AuthContext.Provider value={auth!}>
         <IonReactRouter>
           <IonRouterOutlet>
