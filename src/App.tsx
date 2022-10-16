@@ -1,9 +1,11 @@
 import { Redirect, Route } from 'react-router-dom';
+
 import { IonApp, IonRouterOutlet, IonSpinner, setupIonicReact } from '@ionic/react';
 import { AuthContext, useAuthInit } from './context/auth';
 import { IonReactRouter } from '@ionic/react-router';
 import AppUpdater from './components/AppUpdater';
 import EntryDetails from './pages/EntryDetails';
+import EditEntry from './pages/EditEntry';
 import Register from './pages/Register';
 import NotFound from './pages/NotFound';
 import Login from './pages/Login';
@@ -65,6 +67,12 @@ const App: React.FC = () => {
             </Route>
             <Route exact path="/users/:userId/entries/:id">
               {loggedIn ? <EntryDetails /> : <Redirect to="/login" />}
+            </Route>
+            <Route exact path="/entries/:id/edit">
+              {loggedIn ? <EditEntry /> : <Redirect to="/login" />}
+            </Route>
+            <Route exact path="/users/:userId/entries/:id/edit">
+              {loggedIn ? <EditEntry /> : <Redirect to="/login" />}
             </Route>
             <Route exact path="/">
               <Redirect to="/home" />
