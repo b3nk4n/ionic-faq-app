@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
-import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonPage, IonPopover, IonProgressBar, IonSegment, IonSegmentButton, IonText, IonTitle, IonToolbar } from '@ionic/react';
-import { ellipsisHorizontal, ellipsisVertical } from 'ionicons/icons';
+import { IonButton, IonButtons, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonPage, IonPopover, IonProgressBar, IonSegment, IonSegmentButton, IonText, IonTitle, IonToolbar } from '@ionic/react';
+import { add, ellipsisHorizontal, ellipsisVertical } from 'ionicons/icons';
 import { GoogleAuthProvider, linkWithRedirect } from 'firebase/auth';
 import { collection, getDocs } from 'firebase/firestore'; 
 import { auth, db } from '../firebaseConfig';
@@ -92,6 +92,12 @@ const Home: React.FC = () => {
             </IonItem>
           ))}
         </IonList>
+
+        <IonFab vertical="bottom" horizontal="end" slot="fixed">
+          <IonFabButton routerLink={getAddLink(segmentValue, userId)}>
+            <IonIcon icon={add} />
+          </IonFabButton>
+        </IonFab>
       </IonContent>
     </IonPage>
   );
@@ -104,7 +110,19 @@ function getDetailsLink(segmentValue: SegmentValue, id: string, userId?: string)
   if (segmentValue === 'private' && userId) {
     return `/users/${userId}/entries/${id}`;
   }
-  return '/';
+  
+  throw new Error('Unexpected segment value: ' + segmentValue);
+}
+
+function getAddLink(segmentValue: SegmentValue, userId?: string): string {
+  if (segmentValue === 'public') {
+    return '/entry/new';
+  }
+  if (segmentValue === 'private' && userId) {
+    return `/users/${userId}/entry/new`;
+  }
+  
+  throw new Error('Unexpected segment value: ' + segmentValue);
 }
 
 async function fetchPublicEntries() {

@@ -1,15 +1,16 @@
 import { useParams } from 'react-router';
 import { useEffect, useState } from 'react';
 
-import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonPage, IonSpinner, IonTextarea, IonTitle, IonToolbar, useIonLoading, useIonRouter, useIonToast } from '@ionic/react';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonPage, IonSpinner, IonTextarea, IonTitle, IonToolbar, useIonLoading, useIonRouter, UseIonRouterResult, useIonToast } from '@ionic/react';
+import { addDoc, collection, doc, getDoc, setDoc } from 'firebase/firestore';
 import { isBlank } from '../utils/stringUtils';
 import { cloudUpload } from 'ionicons/icons';
+import { EntryData } from '../types/model';
 import { toEntry } from '../types/mapper';
 import { db } from '../firebaseConfig';
 
 interface RouteParams {
-    id: string;
+    id?: string;
     userId?: string;
 }
 
@@ -24,6 +25,8 @@ const EditEntry: React.FC = () => {
 
     useEffect(() => {
         const loadEntry = async () => {
+            if (!id) return;
+
             await showLoading('Loading entry...');
 
             const docRef = userId
@@ -39,7 +42,7 @@ const EditEntry: React.FC = () => {
         loadEntry();
     }, [id]);
 
-    const handleUpdate = async () => {
+    const handleSave = async () => {
         if (isBlank(title) || isBlank(content)) {
             await showToast('Title and content required.', 3000);
             return;
@@ -47,24 +50,22 @@ const EditEntry: React.FC = () => {
 
         setIsSaving(true);
         try {
-            const docRef = userId
-                ? doc(db, 'users', userId, 'entries', id)
-                : doc(db, 'entries', id);
-            await setDoc(docRef, {
-                title,
-                content
-            });
-            if (router.canGoBack()) {
-                router.goBack();
+            if (id) {
+                await updateEntry({ title, content }, id, userId);
             } else {
-                router.push('/', 'forward', 'replace');
+                await createEntry({ title, content }, userId);
             }
+
+            goBackOrHome(router);
         } catch (error: any) {
             console.error({ error });
         } finally {
             setIsSaving(false);
         }
     };
+
+    const pageTitle = id ? 'Edit Entry' : 'New Entry';
+    const saveButtonTitle = id ? 'Update' : 'Save';
     const parentPath = router.routeInfo.pathname.substring(0, router.routeInfo.pathname.length - 5);
     return (
         <IonPage>
@@ -73,13 +74,13 @@ const EditEntry: React.FC = () => {
                     <IonButtons slot="start">
                         <IonBackButton defaultHref={parentPath} />
                     </IonButtons>
-                    <IonTitle>Edit Entry</IonTitle>
+                    <IonTitle>{pageTitle}</IonTitle>
                     <IonButtons slot="secondary">
-                        <IonButton fill="solid" onClick={handleUpdate}>
+                        <IonButton fill="solid" onClick={handleSave}>
                             {isSaving
                                 ? <IonSpinner slot="start" name="lines-small" color="primary">Test</IonSpinner>
                                 : <IonIcon slot="start" icon={cloudUpload} />}
-                            Update
+                            {saveButtonTitle}
                         </IonButton>
                     </IonButtons>
                 </IonToolbar>
@@ -99,3 +100,25 @@ const EditEntry: React.FC = () => {
 };
 
 export default EditEntry;
+
+function goBackOrHome(router: UseIonRouterResult) {
+    if (router.canGoBack()) {
+        router.goBack();
+    } else {
+        router.push('/', 'forward', 'replace');
+    }
+}
+
+async function updateEntry(data: EntryData, id: string, userId?: string) {
+    const docRef = userId
+        ? doc(db, 'users', userId, 'entries', id)
+        : doc(db, 'entries', id);
+    await setDoc(docRef, data);
+}
+
+async function createEntry(data: EntryData, userId?: string) {
+    const collRef = userId
+        ? collection(db, 'users', userId, 'entries')
+        : collection(db, 'entries');
+    await addDoc(collRef, data);
+}
