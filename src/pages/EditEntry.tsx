@@ -1,8 +1,9 @@
 import { useParams } from 'react-router';
 import { useEffect, useState } from 'react';
 
-import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonPage, IonSpinner, IonTextarea, IonTitle, IonToolbar, useIonLoading, useIonRouter, UseIonRouterResult, useIonToast } from '@ionic/react';
+import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonPage, IonSpinner, IonTextarea, IonTitle, IonToolbar, useIonLoading, useIonRouter, useIonToast } from '@ionic/react';
 import { fetchPrivateEntry, fetchPublicEntry, createEntry, updateEntry } from '../utils/firebaseUtils';
+import { goBackOrHome, parentPath } from '../utils/routerUtils';
 import { isBlank } from '../utils/stringUtils';
 import { cloudUpload } from 'ionicons/icons';
 
@@ -61,13 +62,12 @@ const EditEntry: React.FC = () => {
 
     const pageTitle = id ? 'Edit Entry' : 'New Entry';
     const saveButtonTitle = id ? 'Update' : 'Save';
-    const parentPath = router.routeInfo.pathname.substring(0, router.routeInfo.pathname.length - 5);
     return (
         <IonPage>
             <IonHeader>
                 <IonToolbar color="primary">
                     <IonButtons slot="start">
-                        <IonBackButton defaultHref={parentPath} />
+                        <IonBackButton defaultHref={parentPath(router)} />
                     </IonButtons>
                     <IonTitle>{pageTitle}</IonTitle>
                     <IonButtons slot="secondary">
@@ -95,12 +95,3 @@ const EditEntry: React.FC = () => {
 };
 
 export default EditEntry;
-
-function goBackOrHome(router: UseIonRouterResult) {
-    if (router.canGoBack()) {
-        router.goBack();
-    } else {
-        router.push('/', 'forward', 'replace');
-    }
-}
-

@@ -1,9 +1,10 @@
 import { useParams } from 'react-router';
 import { useEffect, useState } from 'react';
 
-import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonList, IonPage, IonPopover, IonTitle, IonToolbar, useIonLoading, useIonRouter, UseIonRouterResult } from '@ionic/react';
+import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonList, IonPage, IonPopover, IonTitle, IonToolbar, useIonLoading, useIonRouter } from '@ionic/react';
 import { deletePrivateEntry, deletePublicEntry, fetchPrivateEntry, fetchPublicEntry } from '../utils/firebaseUtils';
 import { create, ellipsisHorizontal, ellipsisVertical, trash } from 'ionicons/icons';
+import { goBackOrHome } from '../utils/routerUtils';
 import { Entry } from '../types/model';
 
 import './EntryDetails.css';
@@ -83,13 +84,5 @@ const EntryDetails: React.FC = () => {
         </IonPage>
     );
 };
-
-function goBackOrHome(router: UseIonRouterResult) {
-    if (router.canGoBack()) {
-        router.goBack();
-    } else {
-        router.push('/', 'forward', 'replace');
-    }
-}
 
 export default EntryDetails;
