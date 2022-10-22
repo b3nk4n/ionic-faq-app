@@ -2,11 +2,9 @@ import { useParams } from 'react-router';
 import { useEffect, useState } from 'react';
 
 import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonList, IonPage, IonPopover, IonTitle, IonToolbar, useIonLoading, useIonRouter, UseIonRouterResult } from '@ionic/react';
+import { deletePrivateEntry, deletePublicEntry, fetchPrivateEntry, fetchPublicEntry } from '../utils/firebaseUtils';
 import { create, ellipsisHorizontal, ellipsisVertical, trash } from 'ionicons/icons';
-import { deleteDoc, doc, getDoc } from 'firebase/firestore';
-import { toEntry } from '../types/mapper';
 import { Entry } from '../types/model';
-import { db } from '../firebaseConfig';
 
 import './EntryDetails.css';
 
@@ -26,11 +24,9 @@ const EntryDetails: React.FC = () => {
         const loadEntry = async () => {
             await showLoading('Loading entry...');
 
-            const docRef = userId
-                ? doc(db, 'users', userId, 'entries', id)
-                : doc(db, 'entries', id);
-            const docSnapshot = await getDoc(docRef);
-            const entryData = toEntry(docSnapshot);
+            const entryData = userId
+                ? await fetchPrivateEntry(userId, id)
+                : await fetchPublicEntry(id);
             setEntry(entryData);
 
             await dismissLoading();
@@ -95,15 +91,5 @@ function goBackOrHome(router: UseIonRouterResult) {
         router.push('/', 'forward', 'replace');
     }
 }
-
-async function deletePublicEntry(id: string) {
-    const docRef = doc(db, 'entries', id);
-    await deleteDoc(docRef);
-  }
-  
-  async function deletePrivateEntry(userId: string, id: string) {
-    const docRef = doc(db, 'users', userId, 'entries', id);
-    await deleteDoc(docRef);
-  }
 
 export default EntryDetails;

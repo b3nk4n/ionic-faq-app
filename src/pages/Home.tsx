@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 
 import { IonButton, IonButtons, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonList, IonPage, IonPopover, IonProgressBar, IonSegment, IonSegmentButton, IonText, IonTitle, IonToolbar } from '@ionic/react';
+import { deletePrivateEntry, deletePublicEntry, fetchPrivateEntries, fetchPublicEntries } from '../utils/firebaseUtils';
 import { add, ellipsisHorizontal, ellipsisVertical, heart, trash } from 'ionicons/icons';
 import { GoogleAuthProvider, linkWithRedirect } from 'firebase/auth';
-import { collection, deleteDoc, doc, getDocs } from 'firebase/firestore';
-import { auth, db } from '../firebaseConfig';
-import { toEntry } from '../types/mapper';
 import { useAuth } from '../context/auth';
+import { auth } from '../firebaseConfig';
 import { Entry } from '../types/model';
 
 import './Home.css';
@@ -147,28 +146,6 @@ function getAddLink(segmentValue: SegmentValue, userId?: string): string {
   }
 
   throw new Error('Unexpected segment value: ' + segmentValue);
-}
-
-async function fetchPublicEntries() {
-  // TODO const allPosts = await getDocs(collectionGroup(db, "posts")) as a better way to get docs across users? For the Admin user.
-
-  const querySnapshot = await getDocs(collection(db, 'entries'));
-  return querySnapshot.docs.map(toEntry);
-}
-
-async function fetchPrivateEntries(userId: string) {
-  const querySnapshot = await getDocs(collection(db, 'users', userId, 'entries'));
-  return querySnapshot.docs.map(toEntry);
-}
-
-async function deletePublicEntry(id: string) {
-  const docRef = doc(db, 'entries', id);
-  await deleteDoc(docRef);
-}
-
-async function deletePrivateEntry(userId: string, id: string) {
-  const docRef = doc(db, 'users', userId, 'entries', id);
-  await deleteDoc(docRef);
 }
 
 export default Home;

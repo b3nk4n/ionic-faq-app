@@ -2,12 +2,9 @@ import { useParams } from 'react-router';
 import { useEffect, useState } from 'react';
 
 import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonPage, IonSpinner, IonTextarea, IonTitle, IonToolbar, useIonLoading, useIonRouter, UseIonRouterResult, useIonToast } from '@ionic/react';
-import { addDoc, collection, doc, getDoc, setDoc } from 'firebase/firestore';
+import { fetchPrivateEntry, fetchPublicEntry, createEntry, updateEntry } from '../utils/firebaseUtils';
 import { isBlank } from '../utils/stringUtils';
 import { cloudUpload } from 'ionicons/icons';
-import { EntryData } from '../types/model';
-import { toEntry } from '../types/mapper';
-import { db } from '../firebaseConfig';
 
 interface RouteParams {
     id?: string;
@@ -29,13 +26,11 @@ const EditEntry: React.FC = () => {
 
             await showLoading('Loading entry...');
 
-            const docRef = userId
-                ? doc(db, 'users', userId, 'entries', id)
-                : doc(db, 'entries', id);
-            const docSnapshot = await getDoc(docRef);
-            const entry = toEntry(docSnapshot);
-            setTitle(entry.title);
-            setContent(entry.content);
+            const entryData = userId
+                ? await fetchPrivateEntry(userId, id)
+                : await fetchPublicEntry(id);
+            setTitle(entryData.title);
+            setContent(entryData.content);
 
             await dismissLoading();
         };
@@ -109,16 +104,3 @@ function goBackOrHome(router: UseIonRouterResult) {
     }
 }
 
-async function updateEntry(data: EntryData, id: string, userId?: string) {
-    const docRef = userId
-        ? doc(db, 'users', userId, 'entries', id)
-        : doc(db, 'entries', id);
-    await setDoc(docRef, data);
-}
-
-async function createEntry(data: EntryData, userId?: string) {
-    const collRef = userId
-        ? collection(db, 'users', userId, 'entries')
-        : collection(db, 'entries');
-    await addDoc(collRef, data);
-}
