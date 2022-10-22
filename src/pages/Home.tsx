@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 
-import { IonButton, IonButtons, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonPage, IonPopover, IonProgressBar, IonSegment, IonSegmentButton, IonText, IonTitle, IonToolbar } from '@ionic/react';
-import { add, ellipsisHorizontal, ellipsisVertical } from 'ionicons/icons';
+import { IonButton, IonButtons, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonList, IonPage, IonPopover, IonProgressBar, IonSegment, IonSegmentButton, IonText, IonTitle, IonToolbar } from '@ionic/react';
+import { add, ellipsisHorizontal, ellipsisVertical, heart, trash } from 'ionicons/icons';
 import { GoogleAuthProvider, linkWithRedirect } from 'firebase/auth';
-import { collection, getDocs } from 'firebase/firestore'; 
+import { collection, deleteDoc, doc, getDocs } from 'firebase/firestore';
 import { auth, db } from '../firebaseConfig';
 import { toEntry } from '../types/mapper';
 import { useAuth } from '../context/auth';
@@ -22,7 +22,7 @@ const Home: React.FC = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-    
+
       if (segmentValue === 'public') {
         const entries = await fetchPublicEntries();
         setEntries(entries);
@@ -40,6 +40,14 @@ const Home: React.FC = () => {
   const continueAsGoogle = async () => {
     const provider = new GoogleAuthProvider();
     await linkWithRedirect(auth.currentUser!, provider);
+  }
+
+  const handleDelete = async (id: string) => {
+    if (segmentValue === 'public') {
+      await deletePublicEntry(id);
+    } else if (segmentValue === 'private' && userId) {
+      await deletePrivateEntry(userId, id);
+    }
   }
 
   return (
@@ -82,14 +90,30 @@ const Home: React.FC = () => {
 
         <IonList>
           {entries.map(entry => (
-            <IonItem key={entry.id} routerLink={getDetailsLink(segmentValue, entry.id, userId)} detail>
-              <IonText>
-              <h3><IonText color="primary">{entry.title}</IonText></h3>
-                <p>
-                  {entry.content}
-                </p>
-              </IonText>
-            </IonItem>
+            <IonItemSliding key={entry.id}>
+              <IonItemOptions side="start">
+                <IonItemOption color="success">
+                  <IonIcon slot="start" icon={heart} />
+                  Like
+                </IonItemOption>
+              </IonItemOptions>
+
+              <IonItem key={entry.id} routerLink={getDetailsLink(segmentValue, entry.id, userId)} detail>
+                <IonText>
+                  <h3><IonText color="primary">{entry.title}</IonText></h3>
+                  <p>
+                    {entry.content}
+                  </p>
+                </IonText>
+              </IonItem>
+
+              <IonItemOptions side="end">
+                <IonItemOption color="danger" onClick={() => handleDelete(entry.id)}>
+                  <IonIcon slot="start" icon={trash} />
+                  Delete
+                </IonItemOption>
+              </IonItemOptions>
+            </IonItemSliding>
           ))}
         </IonList>
 
@@ -110,7 +134,7 @@ function getDetailsLink(segmentValue: SegmentValue, id: string, userId?: string)
   if (segmentValue === 'private' && userId) {
     return `/users/${userId}/entries/${id}`;
   }
-  
+
   throw new Error('Unexpected segment value: ' + segmentValue);
 }
 
@@ -121,7 +145,7 @@ function getAddLink(segmentValue: SegmentValue, userId?: string): string {
   if (segmentValue === 'private' && userId) {
     return `/users/${userId}/entry/new`;
   }
-  
+
   throw new Error('Unexpected segment value: ' + segmentValue);
 }
 
@@ -135,6 +159,16 @@ async function fetchPublicEntries() {
 async function fetchPrivateEntries(userId: string) {
   const querySnapshot = await getDocs(collection(db, 'users', userId, 'entries'));
   return querySnapshot.docs.map(toEntry);
+}
+
+async function deletePublicEntry(id: string) {
+  const docRef = doc(db, 'entries', id);
+  await deleteDoc(docRef);
+}
+
+async function deletePrivateEntry(userId: string, id: string) {
+  const docRef = doc(db, 'users', userId, 'entries', id);
+  await deleteDoc(docRef);
 }
 
 export default Home;
