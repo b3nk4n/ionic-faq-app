@@ -1,9 +1,9 @@
 import { useParams } from 'react-router';
 import { useEffect, useState } from 'react';
 
-import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonList, IonPage, IonPopover, IonTitle, IonToolbar, useIonLoading, useIonRouter } from '@ionic/react';
-import { ellipsisHorizontal, ellipsisVertical } from 'ionicons/icons';
-import { doc, getDoc } from 'firebase/firestore';
+import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonList, IonPage, IonPopover, IonTitle, IonToolbar, useIonLoading, useIonRouter, UseIonRouterResult } from '@ionic/react';
+import { create, ellipsisHorizontal, ellipsisVertical, trash } from 'ionicons/icons';
+import { deleteDoc, doc, getDoc } from 'firebase/firestore';
 import { toEntry } from '../types/mapper';
 import { Entry } from '../types/model';
 import { db } from '../firebaseConfig';
@@ -42,6 +42,16 @@ const EntryDetails: React.FC = () => {
         return null;
     }
 
+    const handleDelete = async (id: string) => {
+        if (userId) {
+            await deletePrivateEntry(userId, id);
+        } else {
+            await deletePublicEntry(id);
+        }
+
+        goBackOrHome(router);
+      }
+
     return (
         <IonPage>
             <IonHeader>
@@ -58,7 +68,12 @@ const EntryDetails: React.FC = () => {
                             <IonContent>
                                 <IonList>
                                     <IonItem button detail={false} routerLink={router.routeInfo.pathname + '/edit'}>
+                                        <IonIcon slot="start" icon={create} />
                                         Edit
+                                    </IonItem>
+                                    <IonItem button detail={false} onClick={() => handleDelete(entry.id)}>
+                                        <IonIcon slot="start" icon={trash} />
+                                        Delete
                                     </IonItem>
                                 </IonList>
                             </IonContent>
@@ -72,5 +87,23 @@ const EntryDetails: React.FC = () => {
         </IonPage>
     );
 };
+
+function goBackOrHome(router: UseIonRouterResult) {
+    if (router.canGoBack()) {
+        router.goBack();
+    } else {
+        router.push('/', 'forward', 'replace');
+    }
+}
+
+async function deletePublicEntry(id: string) {
+    const docRef = doc(db, 'entries', id);
+    await deleteDoc(docRef);
+  }
+  
+  async function deletePrivateEntry(userId: string, id: string) {
+    const docRef = doc(db, 'users', userId, 'entries', id);
+    await deleteDoc(docRef);
+  }
 
 export default EntryDetails;
