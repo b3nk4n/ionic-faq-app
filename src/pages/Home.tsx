@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { IonButton, IonButtons, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonList, IonPage, IonPopover, IonProgressBar, IonSegment, IonSegmentButton, IonText, IonTitle, IonToolbar } from '@ionic/react';
-import { deletePrivateEntry, deletePublicEntry, fetchPrivateEntries, fetchPublicEntries } from '../utils/firebaseUtils';
+import { deletePrivateEntry, deletePublicEntry, onPrivateEntriesUpdated, onPublicEntriesUpdated } from '../utils/firebaseUtils';
 import { add, ellipsisHorizontal, ellipsisVertical, heart, trash } from 'ionicons/icons';
 import { GoogleAuthProvider, linkWithRedirect } from 'firebase/auth';
 import { useAuth } from '../context/auth';
@@ -19,21 +19,20 @@ const Home: React.FC = () => {
   const [segmentValue, setSegmentValue] = useState<SegmentValue>('public');
 
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
+    setLoading(true);
 
-      if (segmentValue === 'public') {
-        const entries = await fetchPublicEntries();
+    if (segmentValue === 'public') {
+      return onPublicEntriesUpdated(entries => {
         setEntries(entries);
-      } else if (segmentValue === 'private' && userId) {
-        const entries = await fetchPrivateEntries(userId);
+        setLoading(false);
+      });
+    }
+    if (segmentValue === 'private' && userId) {
+      return onPrivateEntriesUpdated(userId, entries => {
         setEntries(entries);
-      }
-
-      setLoading(false);
-    };
-
-    loadData();
+        setLoading(false);
+      });
+    }
   }, [segmentValue]);
 
   const continueAsGoogle = async () => {

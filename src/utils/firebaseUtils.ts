@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, setDoc, Unsubscribe } from "firebase/firestore";
 import { Entry, EntryData } from "../types/model";
 import { toEntry } from "../types/mapper";
 import { db } from "../firebaseConfig";
@@ -20,6 +20,22 @@ export async function fetchPublicEntries(): Promise<Entry[]> {
 export async function fetchPrivateEntries(userId: string): Promise<Entry[]> {
     const querySnapshot = await getDocs(collection(db, 'users', userId, 'entries'));
     return querySnapshot.docs.map(toEntry);
+}
+
+export function onPublicEntriesUpdated(callback: (entries: Entry[]) => void): Unsubscribe {
+    const collRef = collection(db, 'entries');
+    return onSnapshot(collRef, (snapshot) => {
+      const entries = snapshot.docs.map(toEntry);
+      callback(entries);
+    });
+}
+
+export function onPrivateEntriesUpdated(userId: string, callback: (entries: Entry[]) => void): Unsubscribe {
+    const collRef = collection(db, 'users', userId, 'entries');
+    return onSnapshot(collRef, (snapshot) => {
+      const entries = snapshot.docs.map(toEntry);
+      callback(entries);
+    });
 }
 
 export async function fetchPublicEntry(id: string): Promise<Entry> {
