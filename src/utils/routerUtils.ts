@@ -9,6 +9,6 @@ export function goBackOrHome(router: UseIonRouterResult) {
 }
 
 export function parentPath(router: UseIonRouterResult) {
-    const pagePathLength = 5; // TODO used for "/edit": make this dynamic by path splitting
-    return router.routeInfo.pathname.substring(0, router.routeInfo.pathname.length - pagePathLength);
+    const indexOfLastSlash = router.routeInfo.pathname.lastIndexOf('/')
+    return router.routeInfo.pathname.substring(0, indexOfLastSlash);
 }
