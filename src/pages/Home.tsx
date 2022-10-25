@@ -55,10 +55,10 @@ const Home: React.FC = () => {
           <IonTitle>Home</IonTitle>
           {loading && <IonProgressBar type="indeterminate" color="light"></IonProgressBar>}
           <IonButtons slot="end">
-            <IonButton id="open-popover-menu">
+            <IonButton id="home-open-popover-menu"> {/*The ID needs to be unique across pages, otherwise a wrong popover might be triggered.*/}
               <IonIcon slot="icon-only" ios={ellipsisHorizontal} md={ellipsisVertical} />
             </IonButton>
-            <IonPopover trigger="open-popover-menu" triggerAction="click" dismissOnSelect>
+            <IonPopover trigger="home-open-popover-menu" triggerAction="click" dismissOnSelect>
               <IonContent>
                 <IonList>
                   {anonymous && (

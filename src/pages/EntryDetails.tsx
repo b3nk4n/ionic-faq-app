@@ -58,10 +58,10 @@ const EntryDetails: React.FC = () => {
                     </IonButtons>
                     <IonTitle>{entry.title}</IonTitle>
                     <IonButtons slot="end">
-                        <IonButton id="open-popover-menu">
+                        <IonButton id="details-open-popover-menu">
                             <IonIcon slot="icon-only" ios={ellipsisHorizontal} md={ellipsisVertical} />
                         </IonButton>
-                        <IonPopover trigger="open-popover-menu" triggerAction="click" dismissOnSelect>
+                        <IonPopover trigger="details-open-popover-menu" triggerAction="click" dismissOnSelect>
                             <IonContent>
                                 <IonList>
                                     <IonItem button detail={false} routerLink={router.routeInfo.pathname + '/edit'}>
