@@ -24,15 +24,31 @@ export async function fetchPrivateEntries(userId: string): Promise<Entry[]> {
 
 export function onPublicEntriesUpdated(callback: (entries: Entry[]) => void): Unsubscribe {
     const collRef = collection(db, 'entries');
-    return onSnapshot(collRef, (snapshot) => {
+    return onSnapshot(collRef, snapshot => {
       const entries = snapshot.docs.map(toEntry);
       callback(entries);
     });
 }
 
+export function onPrivateEntryUpdated(userId: string, id: string, callback: (entry: Entry) => void): Unsubscribe {
+    const docRef = doc(db, 'users', userId, 'entries', id);
+    return onSnapshot(docRef, snapshot => {
+      const entry = toEntry(snapshot);
+      callback(entry);
+    });
+}
+
+export function onPublicEntryUpdated(id: string, callback: (entry: Entry) => void): Unsubscribe {
+    const collRef = doc(db, 'entries', id);
+    return onSnapshot(collRef, snapshot => {
+      const entry = toEntry(snapshot);
+      callback(entry);
+    });
+}
+
 export function onPrivateEntriesUpdated(userId: string, callback: (entries: Entry[]) => void): Unsubscribe {
     const collRef = collection(db, 'users', userId, 'entries');
-    return onSnapshot(collRef, (snapshot) => {
+    return onSnapshot(collRef, snapshot => {
       const entries = snapshot.docs.map(toEntry);
       callback(entries);
     });

@@ -2,7 +2,7 @@ import { useParams } from 'react-router';
 import { useEffect, useState } from 'react';
 
 import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonList, IonPage, IonPopover, IonTitle, IonToolbar, useIonLoading, useIonRouter } from '@ionic/react';
-import { deletePrivateEntry, deletePublicEntry, fetchPrivateEntry, fetchPublicEntry } from '../utils/firebaseUtils';
+import { deletePrivateEntry, deletePublicEntry, onPrivateEntryUpdated, onPublicEntryUpdated } from '../utils/firebaseUtils';
 import { create, ellipsisHorizontal, ellipsisVertical, trash } from 'ionicons/icons';
 import { goBackOrHome } from '../utils/routerUtils';
 import { Entry } from '../types/model';
@@ -20,17 +20,21 @@ const EntryDetails: React.FC = () => {
     const [entry, setEntry] = useState<Entry>();
     const [showLoading, dismissLoading] = useIonLoading();
 
-    // TODO reload data after entry is updated. Subscribe snapshot changed?
     useEffect(() => {
         const loadEntry = async () => {
             await showLoading('Loading entry...');
 
-            const entryData = userId
-                ? await fetchPrivateEntry(userId, id)
-                : await fetchPublicEntry(id);
-            setEntry(entryData);
+            if (userId) {
+                return onPrivateEntryUpdated(userId, id, async entry => {
+                    setEntry(entry);
+                    await dismissLoading();
+                });
+            }
 
-            await dismissLoading();
+            return onPublicEntryUpdated(id, async entry => {
+                setEntry(entry);
+                await dismissLoading();
+            });
         };
         loadEntry();
     }, [id]);
@@ -47,7 +51,7 @@ const EntryDetails: React.FC = () => {
         }
 
         goBackOrHome(router);
-      }
+    }
 
     return (
         <IonPage>
