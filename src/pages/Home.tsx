@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { IonButton, IonButtons, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonList, IonPage, IonPopover, IonProgressBar, IonSegment, IonSegmentButton, IonText, IonTitle, IonToolbar } from '@ionic/react';
 import { deletePrivateEntry, deletePublicEntry, onPrivateEntriesUpdated, onPublicEntriesUpdated } from '../utils/firebaseUtils';
 import { add, ellipsisHorizontal, ellipsisVertical, heart, trash } from 'ionicons/icons';
-import { GoogleAuthProvider, linkWithRedirect } from 'firebase/auth';
+import { deleteUser, GoogleAuthProvider, linkWithRedirect } from 'firebase/auth';
 import { useAuth } from '../context/auth';
 import { auth } from '../firebaseConfig';
 import { Entry } from '../types/model';
@@ -48,6 +48,20 @@ const Home: React.FC = () => {
     }
   }
 
+  const handleDeleteAccount = async () => {
+    if (!auth.currentUser) {
+      return;
+    }
+    
+    try {
+      await deleteUser(auth.currentUser)
+    } catch (error: any) {
+      // User potentially requires re-authentication:
+      // https://firebase.google.com/docs/auth/web/manage-users#re-authenticate_a_user
+      console.log({ error });
+    }
+  };
+
   return (
     <IonPage>
       <IonHeader>
@@ -69,6 +83,11 @@ const Home: React.FC = () => {
                   <IonItem button detail={false} onClick={() => auth.signOut()}>
                     Logout
                   </IonItem>
+                  {auth.currentUser && (
+                    <IonItem button detail={false} onClick={handleDeleteAccount}>
+                      Delete account
+                    </IonItem>
+                  )}
                 </IonList>
               </IonContent>
             </IonPopover>
