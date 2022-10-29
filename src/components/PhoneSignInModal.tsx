@@ -11,7 +11,12 @@ interface Props {
     onLoginSuccess: (user: User) => void;
 }
 
-//var recaptchaVerifier: RecaptchaVerifier;
+declare global {
+    interface Window {
+        recaptchaVerifier: RecaptchaVerifier;
+        grecaptcha: any;
+    }
+}
 
 const PhoneSignInModal = ({ isOpen, onCancel, onLoginSuccess }: Props) => {
     const [phoneNumber, setPhoneNumber] = useState<string>();
@@ -37,7 +42,7 @@ const PhoneSignInModal = ({ isOpen, onCancel, onLoginSuccess }: Props) => {
             return;
         }
 
-        const recaptchaVerifier = new RecaptchaVerifier('phone-sign-in-container', {
+        window.recaptchaVerifier = new RecaptchaVerifier('phone-sign-in-container', {
             'size': 'invisible',
             'callback': async (response: any) => {
                 console.log('Invisible reCAPTCHA solved.');
@@ -48,10 +53,11 @@ const PhoneSignInModal = ({ isOpen, onCancel, onLoginSuccess }: Props) => {
         }, auth);
 
         try {
-            const result = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
+            const result = await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
             setConfirmationResult(result);
         } catch (error: any) {
             console.error({ msg: 'Error sending SMS.', error });
+            await resetRecaptchaVerifier();
         }
     };
 
@@ -62,7 +68,7 @@ const PhoneSignInModal = ({ isOpen, onCancel, onLoginSuccess }: Props) => {
             return;
         }
 
-        const recaptchaVerifier = new RecaptchaVerifier('phone-sign-in-container', {
+        window.recaptchaVerifier = new RecaptchaVerifier('phone-sign-in-container', {
             'size': 'normal',
             'callback': async (response: any) => {
                 console.log('Normal reCAPTCHA solved.');
@@ -73,7 +79,26 @@ const PhoneSignInModal = ({ isOpen, onCancel, onLoginSuccess }: Props) => {
         }, auth);
 
         try {
-            const result = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
+            const result = await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
+            setConfirmationResult(result);
+        } catch (error: any) {
+            console.error({ msg: 'Error sending SMS.', error });
+            await resetRecaptchaVerifier();
+        }
+    };
+
+    const handleResendCode = async () => {
+        if (!window.recaptchaVerifier) {
+            return;
+        }
+
+        if (!phoneNumber) {
+            return;
+        }
+
+        try {
+            await resetRecaptchaVerifier();
+            const result = await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
             setConfirmationResult(result);
         } catch (error: any) {
             console.error({ msg: 'Error sending SMS.', error });
@@ -94,9 +119,7 @@ const PhoneSignInModal = ({ isOpen, onCancel, onLoginSuccess }: Props) => {
         onCancel();
     };
 
-    // TODO handle wrong phone number or wrong code better
-    // TODO handle better to use one and then then other mode. Or simply prevent this?
-
+    const confirmationCodeRequested = Boolean(confirmationResult);
     return (
         <IonModal isOpen={isOpen} onIonModalDidPresent={registerReCaptcha} onIonModalDidDismiss={handleCancel}>
             <IonHeader>
@@ -112,8 +135,15 @@ const PhoneSignInModal = ({ isOpen, onCancel, onLoginSuccess }: Props) => {
                     <IonLabel position="stacked">Enter your phone number</IonLabel>
                     <IonInput type="tel" placeholder="+1 650-555-1234" onIonChange={e => setPhoneNumber(e.detail.value ?? '')} />
                 </IonItem>
-                <IonButton onClick={handleGetCodeInvisibleClick}>Get code via invisible reCAPTCHA</IonButton>
-                <IonButton onClick={handleGetCodeNormalClick}>Get code via normal reCAPTCHA</IonButton>
+                {!confirmationCodeRequested && (
+                    <>
+                        <IonButton onClick={handleGetCodeInvisibleClick}>Get code via invisible reCAPTCHA</IonButton>
+                        <IonButton onClick={handleGetCodeNormalClick}>Get code via normal reCAPTCHA</IonButton>
+                    </>
+                )}
+                {confirmationCodeRequested && (
+                    <IonButton onClick={handleResendCode}>Resend code</IonButton>
+                )}
                 <div id="phone-sign-in-container" /> {/* TODO fix checkmark removed after reCAPCTHA resolved with success. */}
                 {Boolean(confirmationResult) && (
                     <>
@@ -128,5 +158,10 @@ const PhoneSignInModal = ({ isOpen, onCancel, onLoginSuccess }: Props) => {
         </IonModal>
     );
 };
+
+async function resetRecaptchaVerifier(): Promise<void> {
+    const widgetId = await window.recaptchaVerifier.render()
+    window.grecaptcha.reset(widgetId);
+}
 
 export default PhoneSignInModal

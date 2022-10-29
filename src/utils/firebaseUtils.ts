@@ -11,8 +11,6 @@ export async function createEntry(data: EntryData, userId?: string): Promise<voi
 }
 
 export async function fetchPublicEntries(): Promise<Entry[]> {
-    // TODO const allPosts = await getDocs(collectionGroup(db, "posts")) as a better way to get docs across users? For the Admin user.
-
     const querySnapshot = await getDocs(collection(db, 'entries'));
     return querySnapshot.docs.map(toEntry);
 }
