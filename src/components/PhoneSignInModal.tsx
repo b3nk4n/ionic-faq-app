@@ -23,18 +23,6 @@ const PhoneSignInModal = ({ isOpen, onCancel, onLoginSuccess }: Props) => {
     const [confirmationResult, setConfirmationResult] = useState<any>(null);
     const [code, setCode] = useState<number>();
 
-    const registerReCaptcha = useCallback(async () => {
-        // recaptchaVerifier = new RecaptchaVerifier('phone-sign-in-container', {
-        //     'size': recaptchaMode,
-        //     'callback': async (response: any) => {
-        //         console.log('Invisible reCAPTCHA solved.');
-        //     },
-        //     'expired-callback': (error: any) => {
-        //         console.error({ msg: 'reCAPTCHA expired.', error });
-        //     }
-        // }, auth);
-    }, [isOpen]);
-
     const handleGetCodeInvisibleClick = async (e: any) => {
         e.preventDefault();
 
@@ -121,7 +109,7 @@ const PhoneSignInModal = ({ isOpen, onCancel, onLoginSuccess }: Props) => {
 
     const confirmationCodeRequested = Boolean(confirmationResult);
     return (
-        <IonModal isOpen={isOpen} onIonModalDidPresent={registerReCaptcha} onIonModalDidDismiss={handleCancel}>
+        <IonModal isOpen={isOpen} onIonModalDidDismiss={handleCancel}>
             <IonHeader>
                 <IonToolbar>
                     <IonTitle>Phone Login</IonTitle>
@@ -144,7 +132,7 @@ const PhoneSignInModal = ({ isOpen, onCancel, onLoginSuccess }: Props) => {
                 {confirmationCodeRequested && (
                     <IonButton onClick={handleResendCode}>Resend code</IonButton>
                 )}
-                <div id="phone-sign-in-container" /> {/* TODO fix checkmark removed after reCAPCTHA resolved with success. */}
+                <div id="phone-sign-in-container" /> {/* TODO fix checkmark removed after visible reCAPCTHA resolved with success. */}
                 {Boolean(confirmationResult) && (
                     <>
                         <IonItem>
