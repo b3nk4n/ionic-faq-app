@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { IonButton, IonButtons, IonContent, IonFab, IonFabButton, IonHeader, IonIcon, IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonList, IonPage, IonPopover, IonProgressBar, IonSegment, IonSegmentButton, IonText, IonTitle, IonToolbar } from '@ionic/react';
-import { deletePrivateEntry, deletePublicEntry, onPrivateEntriesUpdated, onPublicEntriesUpdated } from '../utils/firebaseUtils';
+import { deletePrivateEntry, deletePublicEntry, onPrivateEntriesUpdated, onPublicEntriesUpdated, resetAllUsersPublicUpvotes } from '../utils/firebaseUtils';
 import { add, ellipsisHorizontal, ellipsisVertical, heart, trash } from 'ionicons/icons';
 import { deleteUser, GoogleAuthProvider, linkWithRedirect } from 'firebase/auth';
 import { useAuth } from '../context/auth';
@@ -62,6 +62,12 @@ const Home: React.FC = () => {
     }
   };
 
+  const handleResetAllPublicLikes = async () => {
+    if (!userId) return;
+
+    await resetAllUsersPublicUpvotes(userId);
+  }
+
   return (
     <IonPage>
       <IonHeader>
@@ -75,6 +81,11 @@ const Home: React.FC = () => {
             <IonPopover trigger="home-open-popover-menu" triggerAction="click" dismissOnSelect>
               <IonContent>
                 <IonList>
+                  {segmentValue === 'public' && userId && (
+                    <IonItem button detail={false} onClick={handleResetAllPublicLikes}>
+                      Reset all public likes
+                    </IonItem>
+                  )}
                   {anonymous && (
                     <IonItem button detail={false} onClick={continueAsGoogle}>
                       Continue via Google Login

@@ -1,7 +1,7 @@
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, setDoc, Unsubscribe } from "firebase/firestore";
+import { db, resetAllPublicUpvotes } from "../firebaseConfig";
 import { Entry, EntryData } from "../types/model";
 import { toEntry } from "../types/mapper";
-import { db } from "../firebaseConfig";
 
 export async function createEntry(data: EntryData, userId?: string): Promise<void> {
     const collRef = userId
@@ -79,4 +79,12 @@ export async function deletePublicEntry(id: string): Promise<void> {
 export async function deletePrivateEntry(userId: string, id: string): Promise<void> {
     const docRef = doc(db, 'users', userId, 'entries', id);
     await deleteDoc(docRef);
+}
+
+export async function resetAllUsersPublicUpvotes(userId: string): Promise<void> {
+    try {
+        await resetAllPublicUpvotes();
+    } catch (error: any) {
+        console.log({ error });
+    }
 }

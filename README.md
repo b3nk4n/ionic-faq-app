@@ -65,9 +65,11 @@ First create a production build:
 ionic build --prod
 ```
 
-The production build created in the `build` folder can then be deployed, such as via Firebase Hosting:
+The production build created in the `build` folder can then be deployed, such as via Firebase hosting:
 
 ```
 firebase deploy
+firebase deploy --only hosting
 firebase deploy --only functions
+firebase deploy --only hosting,functions
 ```
