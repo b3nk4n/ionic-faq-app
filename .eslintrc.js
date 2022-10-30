@@ -18,7 +18,10 @@ module.exports = {
     sourceType: "module",
   },
   ignorePatterns: [
-    "/lib/**/*", // Ignore built files.
+    "capacitor.config.ts",
+    "/src/react-app-env.d.ts",
+    "/src/reportWebVitals.ts",
+    "/src/setupTests.ts",
   ],
   plugins: [
     "@typescript-eslint",

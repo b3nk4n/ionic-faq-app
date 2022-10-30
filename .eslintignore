@@ -1,0 +1,2 @@
+# Generally ignore the Firebase functions sub-project when executed in context of the Ionic app
+functions/*

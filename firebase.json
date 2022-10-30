@@ -22,6 +22,10 @@
           }
         ]
       }
+    ],
+    "predeploy": [
+      "npm run lint",
+      "ionic build --prod"
     ]
   },
   "functions": [
