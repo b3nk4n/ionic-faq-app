@@ -6,8 +6,8 @@ import {
   getDoc,
   getDocs,
   onSnapshot,
-  setDoc,
   Unsubscribe,
+  updateDoc,
 } from "firebase/firestore";
 import { db, resetAllPublicUpvotes } from "../firebaseConfig";
 import { Entry, EntryData } from "../types/model";
@@ -15,14 +15,19 @@ import { toEntry } from "../types/mapper";
 
 /**
  * Creates a new entry.
- * @param {EntryData} data   The entry data.
+ * @param {string} title The title of the entry.
+ * @param {string} content The content of the entry.
  * @param {string} [userId] The optional user ID if private.
  */
-export async function createEntry(data: EntryData, userId?: string): Promise<void> {
+export async function createEntry(title: string, content: string, userId?: string): Promise<void> {
   const collRef = userId ?
     collection(db, "users", userId, "entries") :
     collection(db, "entries");
-  await addDoc(collRef, data);
+  await addDoc(collRef, {
+    title,
+    content,
+    upvotes: 0,
+  } as EntryData);
 }
 
 /**
@@ -137,14 +142,19 @@ export async function fetchPrivateEntry(userId: string, id: string): Promise<Ent
 
 /**
  * Updates a public or private entry.
- * @param {EntryData} data The entry data.
+ * @param {string} title The title of the entry.
+ * @param {string} content The content of the entry.
  * @param {string} id The ID of the entry to update.
  * @param {string} [userId] The user ID if private.
  */
-export async function updateEntry(data: EntryData, id: string, userId?: string): Promise<void> {
+export async function updateEntry(title: string, content: string, id: string, userId?: string): Promise<void> {
   const docRef = userId ?
     doc(db, "users", userId, "entries", id) : doc(db, "entries", id);
-  await setDoc(docRef, data);
+  await updateDoc(docRef, {
+    title,
+    content,
+    upvotes: 0,
+  });
 }
 
 /**

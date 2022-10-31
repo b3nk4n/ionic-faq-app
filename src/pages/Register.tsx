@@ -1,25 +1,41 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonIcon, IonButton, IonList, IonItem, IonLabel, IonInput, IonText, IonLoading, IonButtons, IonBackButton } from '@ionic/react';
+import {
+  IonContent,
+  IonHeader,
+  IonPage,
+  IonTitle,
+  IonToolbar,
+  IonIcon,
+  IonButton,
+  IonList,
+  IonItem,
+  IonLabel,
+  IonInput,
+  IonText,
+  IonLoading,
+  IonButtons,
+  IonBackButton,
+} from "@ionic/react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from '../firebaseConfig';
-import { logIn } from 'ionicons/icons';
+import { auth } from "../firebaseConfig";
+import { logIn } from "ionicons/icons";
 
-import './Register.css';
+import "./Register.css";
 
 const Register: React.FC = () => {
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [status, setStatus] = useState({ loading: false, error: false });
 
   const handleRegister = async () => {
     setStatus({ loading: true, error: false });
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      await createUserWithEmailAndPassword(auth, email, password);
       setStatus({ loading: false, error: false });
     } catch (error) {
-      console.log({error});
+      console.log({ error });
       setStatus({ loading: false, error: true });
     }
   };
@@ -38,11 +54,11 @@ const Register: React.FC = () => {
         <IonList>
           <IonItem>
             <IonLabel position="stacked">Email</IonLabel>
-            <IonInput type="email" value={email} onIonChange={e => setEmail(e.detail.value ?? '')} />
+            <IonInput type="email" value={email} onIonChange={(e) => setEmail(e.detail.value ?? "")} />
           </IonItem>
           <IonItem>
             <IonLabel position="stacked">Password</IonLabel>
-            <IonInput type="password" value={password} onIonChange={e => setPassword(e.detail.value ?? '')} />
+            <IonInput type="password" value={password} onIonChange={(e) => setPassword(e.detail.value ?? "")} />
           </IonItem>
         </IonList>
         {status.error && <IonText color="danger">Registration failed.</IonText>}

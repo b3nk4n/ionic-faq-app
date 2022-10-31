@@ -1,22 +1,25 @@
-import React from 'react';
-import { createRoot } from 'react-dom/client';
+import React from "react";
+import { createRoot } from "react-dom/client";
 
-import { defineCustomElements } from '@ionic/pwa-elements/loader';
+import { defineCustomElements } from "@ionic/pwa-elements/loader";
 
-import reportWebVitals from './reportWebVitals';
-import App from './App';
+import reportWebVitals from "./reportWebVitals";
+import App from "./App";
 
-const container = document.getElementById('root');
-const root = createRoot(container!);
-root.render(
-  // IonLoading / useIonLoading dismiss functionality causes problems when strict-mode is enabled,
-  // because it causes e.g. all useEffect hooks to be executed twice. And because it is required
-  // that between show and dismiss are at least about 150ms, the shown loading indicator from the
-  // first render cylce does not get properly dismissed and is therefore stuck.
-  // <React.StrictMode>
-    <App />
-  // </React.StrictMode>
-);
+const container = document.getElementById("root");
+
+if (container) {
+  const root = createRoot(container);
+  root.render(
+      // IonLoading / useIonLoading dismiss functionality causes problems when strict-mode is enabled,
+      // because it causes e.g. all useEffect hooks to be executed twice. And because it is required
+      // that between show and dismiss are at least about 150ms, the shown loading indicator from the
+      // first render cylce does not get properly dismissed and is therefore stuck.
+      // <React.StrictMode>
+      <App />
+      // </React.StrictMode>
+  );
+}
 
 // Some Capacitor plugins, including the Camera API, provide the web-based functionality and UI
 // via the Ionic PWA Elements library.

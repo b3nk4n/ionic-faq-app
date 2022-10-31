@@ -22,6 +22,7 @@ module.exports = {
     "/src/react-app-env.d.ts",
     "/src/reportWebVitals.ts",
     "/src/setupTests.ts",
+    "/build/**/*",
   ],
   plugins: [
     "@typescript-eslint",
@@ -33,5 +34,6 @@ module.exports = {
     "max-len": ["error", { "code": 120 }],
     "object-curly-spacing": ["error", "always"],
     "require-jsdoc": 0,
+    "@typescript-eslint/no-explicit-any": "off",
   },
 };

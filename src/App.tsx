@@ -1,34 +1,35 @@
-import { Redirect, Route } from 'react-router-dom';
+import { Redirect, Route } from "react-router-dom";
 
-import { IonApp, IonRouterOutlet, IonSpinner, setupIonicReact } from '@ionic/react';
-import { AuthContext, useAuthInit } from './context/auth';
-import { IonReactRouter } from '@ionic/react-router';
-import AppUpdater from './components/AppUpdater';
-import EntryDetails from './pages/EntryDetails';
-import EditEntry from './pages/EditEntry';
-import Register from './pages/Register';
-import NotFound from './pages/NotFound';
-import Login from './pages/Login';
-import Home from './pages/Home';
+import { IonApp, IonRouterOutlet, IonSpinner, setupIonicReact } from "@ionic/react";
+import { AuthContext, useAuthInit } from "./context/auth";
+import { IonReactRouter } from "@ionic/react-router";
+import AppUpdater from "./components/AppUpdater";
+import EntryDetails from "./pages/EntryDetails";
+import EditEntry from "./pages/EditEntry";
+import Register from "./pages/Register";
+import NotFound from "./pages/NotFound";
+import Login from "./pages/Login";
+import Home from "./pages/Home";
 
 /* Core CSS required for Ionic components to work properly */
-import '@ionic/react/css/core.css';
+import "@ionic/react/css/core.css";
 
 /* Basic CSS for apps built with Ionic */
-import '@ionic/react/css/normalize.css';
-import '@ionic/react/css/structure.css';
-import '@ionic/react/css/typography.css';
+import "@ionic/react/css/normalize.css";
+import "@ionic/react/css/structure.css";
+import "@ionic/react/css/typography.css";
 
 /* Optional CSS utils that can be commented out */
-import '@ionic/react/css/padding.css';
-import '@ionic/react/css/float-elements.css';
-import '@ionic/react/css/text-alignment.css';
-import '@ionic/react/css/text-transformation.css';
-import '@ionic/react/css/flex-utils.css';
-import '@ionic/react/css/display.css';
+import "@ionic/react/css/padding.css";
+import "@ionic/react/css/float-elements.css";
+import "@ionic/react/css/text-alignment.css";
+import "@ionic/react/css/text-transformation.css";
+import "@ionic/react/css/flex-utils.css";
+import "@ionic/react/css/display.css";
 
 /* Theme variables */
-import './theme/variables.css';
+import "./theme/variables.css";
+import "./App.css";
 
 setupIonicReact();
 
@@ -39,7 +40,7 @@ const App: React.FC = () => {
     return (
       <IonApp>
         <AppUpdater />
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", background: "white", height: "100%" }}>
+        <div className="loading-wrapper">
           <IonSpinner color="primary" name="dots" />
         </div>
       </IonApp>
@@ -50,7 +51,7 @@ const App: React.FC = () => {
   return (
     <IonApp>
       <AppUpdater />
-      <AuthContext.Provider value={auth!}>
+      <AuthContext.Provider value={auth}>
         <IonReactRouter>
           <IonRouterOutlet>
             <Route exact path="/login">
@@ -91,6 +92,6 @@ const App: React.FC = () => {
       </AuthContext.Provider>
     </IonApp>
   );
-}
+};
 
 export default App;

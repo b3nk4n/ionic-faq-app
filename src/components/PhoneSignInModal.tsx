@@ -10,7 +10,7 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { RecaptchaVerifier, signInWithPhoneNumber, User } from "firebase/auth";
+import { ConfirmationResult, RecaptchaVerifier, signInWithPhoneNumber, User } from "firebase/auth";
 import { useState } from "react";
 import { auth } from "../firebaseConfig";
 
@@ -29,10 +29,11 @@ declare global {
     }
 }
 
+// @eslint-disable no-unused-var
 const PhoneSignInModal = ({ isOpen, onCancel, onLoginSuccess }: Props) => {
   const [phoneNumber, setPhoneNumber] = useState<string>();
-  const [confirmationResult, setConfirmationResult] = useState<any>(null);
-  const [code, setCode] = useState<number>();
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
+  const [code, setCode] = useState<string>();
 
   const handleGetCodeInvisibleClick = async (e: any) => {
     e.preventDefault();
@@ -43,7 +44,7 @@ const PhoneSignInModal = ({ isOpen, onCancel, onLoginSuccess }: Props) => {
 
     window.recaptchaVerifier = new RecaptchaVerifier("phone-sign-in-container", {
       "size": "invisible",
-      "callback": async (response: any) => {
+      "callback": async () => {
         console.log("Invisible reCAPTCHA solved.");
       },
       "expired-callback": (error: any) => {
@@ -54,13 +55,13 @@ const PhoneSignInModal = ({ isOpen, onCancel, onLoginSuccess }: Props) => {
     try {
       const result = await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
       setConfirmationResult(result);
-    } catch (error: any) {
+    } catch (error) {
       console.error({ msg: "Error sending SMS.", error });
       await resetRecaptchaVerifier();
     }
   };
 
-  const handleGetCodeNormalClick = async (e: any) => {
+  const handleGetCodeNormalClick = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
 
     if (!phoneNumber) {
@@ -69,7 +70,7 @@ const PhoneSignInModal = ({ isOpen, onCancel, onLoginSuccess }: Props) => {
 
     window.recaptchaVerifier = new RecaptchaVerifier("phone-sign-in-container", {
       "size": "normal",
-      "callback": async (response: any) => {
+      "callback": async () => {
         console.log("Normal reCAPTCHA solved.");
       },
       "expired-callback": (error: any) => {
@@ -80,7 +81,7 @@ const PhoneSignInModal = ({ isOpen, onCancel, onLoginSuccess }: Props) => {
     try {
       const result = await signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier);
       setConfirmationResult(result);
-    } catch (error: any) {
+    } catch (error) {
       console.error({ msg: "Error sending SMS.", error });
       await resetRecaptchaVerifier();
     }
@@ -105,6 +106,10 @@ const PhoneSignInModal = ({ isOpen, onCancel, onLoginSuccess }: Props) => {
   };
 
   const handleSubmitCodeClick = async () => {
+    if (!confirmationResult || !code) {
+      return;
+    }
+
     try {
       const result = await confirmationResult.confirm(code);
       onLoginSuccess(result.user);
@@ -153,7 +158,7 @@ const PhoneSignInModal = ({ isOpen, onCancel, onLoginSuccess }: Props) => {
           <>
             <IonItem>
               <IonLabel position="stacked">Enter the code</IonLabel>
-              <IonInput type="text" placeholder="123456" onIonChange={(e) => setCode(Number(e.detail.value) ?? 0)} />
+              <IonInput type="text" placeholder="123456" onIonChange={(e) => setCode(e.detail.value ?? "")} />
             </IonItem>
             <IonButton onClick={handleSubmitCodeClick}>Submit code</IonButton>
           </>

@@ -5,4 +5,5 @@ export interface Entry extends EntryData {
 export interface EntryData {
     title: string;
     content: string;
+    upvotes: number;
 }

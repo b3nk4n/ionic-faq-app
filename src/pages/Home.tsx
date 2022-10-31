@@ -64,8 +64,12 @@ const Home: React.FC = () => {
   }, [segmentValue]);
 
   const continueAsGoogle = async () => {
+    if (!auth.currentUser) {
+      return;
+    }
+
     const provider = new GoogleAuthProvider();
-    await linkWithRedirect(auth.currentUser!, provider);
+    await linkWithRedirect(auth.currentUser, provider);
   };
 
   const handleDelete = async (id: string) => {
