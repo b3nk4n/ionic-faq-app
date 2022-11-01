@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import {
+  IonBadge,
   IonButton,
   IonButtons,
   IonContent,
@@ -22,6 +23,7 @@ import {
   IonText,
   IonTitle,
   IonToolbar,
+  useIonToast,
 } from "@ionic/react";
 import {
   deletePrivateEntry,
@@ -29,6 +31,7 @@ import {
   onPrivateEntriesUpdated,
   onPublicEntriesUpdated,
   resetAllUsersPublicUpvotes,
+  upvote,
 } from "../utils/firebaseUtils";
 import { add, ellipsisHorizontal, ellipsisVertical, heart, trash } from "ionicons/icons";
 import { deleteUser, GoogleAuthProvider, linkWithRedirect } from "firebase/auth";
@@ -45,6 +48,7 @@ const Home: React.FC = () => {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [segmentValue, setSegmentValue] = useState<SegmentValue>("public");
+  const [showToast] = useIonToast();
 
   useEffect(() => {
     setLoading(true);
@@ -70,6 +74,14 @@ const Home: React.FC = () => {
 
     const provider = new GoogleAuthProvider();
     await linkWithRedirect(auth.currentUser, provider);
+  };
+
+  const handleLike = async (id: string) => {
+    const success = upvote(id);
+
+    if (!success) {
+      showToast("You already upvoted on this entry.", 3000);
+    }
   };
 
   const handleDelete = async (id: string) => {
@@ -153,7 +165,7 @@ const Home: React.FC = () => {
           {entries.map((entry) => (
             <IonItemSliding key={entry.id}>
               <IonItemOptions side="start">
-                <IonItemOption color="success">
+                <IonItemOption color="secondary" onClick={() => handleLike(entry.id)}>
                   <IonIcon slot="start" icon={heart} />
                   Like
                 </IonItemOption>
@@ -166,6 +178,10 @@ const Home: React.FC = () => {
                     {entry.content}
                   </p>
                 </IonText>
+                <IonBadge slot="end" color="secondary">
+                  <IonIcon className="badge-icon" icon={heart} />
+                  {entry.upvotes}
+                </IonBadge>
               </IonItem>
 
               <IonItemOptions side="end">

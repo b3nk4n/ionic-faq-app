@@ -61,3 +61,38 @@ export const resetAllPublicUpvotes = functions.https.onCall((_, context) => {
     upvotedOn: [],
   });
 });
+
+export const upvoteEntry = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError(
+        "unauthenticated",
+        "Upvoting requires authentication."
+    );
+  }
+
+  const userDocRef = admin.firestore().collection("users").doc(context.auth.uid);
+  const entryDocRef = admin.firestore().collection("entries").doc(data.id);
+
+  const userDoc = await userDocRef.get();
+  const userData = userDoc.data();
+  if (userData?.upvotedOn.includes(data.id)) {
+    throw new functions.https.HttpsError(
+        "failed-precondition",
+        "Upvoting for an entry is only allowed once."
+    );
+  }
+
+  try {
+    await userDocRef.update({
+      upvotedOn: [...(userData?.upvotedOn ?? []), data.id],
+    });
+    await entryDocRef.update({
+      upvotes: admin.firestore.FieldValue.increment(1),
+    });
+  } catch (error) {
+    throw new functions.https.HttpsError(
+        "internal",
+        "Update failed internally."
+    );
+  }
+});

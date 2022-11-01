@@ -18,3 +18,4 @@ export const db = getFirestore(app);
 
 const functions = getFunctions();
 export const resetAllPublicUpvotes = httpsCallable(functions, "resetAllPublicUpvotes");
+export const upvoteEntry = httpsCallable(functions, "upvoteEntry");

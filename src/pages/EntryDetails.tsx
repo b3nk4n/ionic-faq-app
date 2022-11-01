@@ -3,12 +3,14 @@ import { useEffect, useState } from "react";
 
 import {
   IonBackButton,
+  IonBadge,
   IonButton,
   IonButtons,
   IonContent,
   IonHeader,
   IonIcon,
   IonItem,
+  IonLabel,
   IonList,
   IonPage,
   IonPopover,
@@ -23,7 +25,7 @@ import {
   onPrivateEntryUpdated,
   onPublicEntryUpdated,
 } from "../utils/firebaseUtils";
-import { create, ellipsisHorizontal, ellipsisVertical, trash } from "ionicons/icons";
+import { create, ellipsisHorizontal, ellipsisVertical, trash, heart } from "ionicons/icons";
 import { goBackOrHome } from "../utils/routerUtils";
 import { Entry } from "../types/model";
 
@@ -81,6 +83,10 @@ const EntryDetails: React.FC = () => {
             <IonBackButton defaultHref='/' />
           </IonButtons>
           <IonTitle>{entry.title}</IonTitle>
+          <IonBadge slot="end" color="secondary">
+            <IonIcon className="badge-like-icon" icon={heart} />
+            <IonLabel className="badge-like-text">{entry.upvotes}</IonLabel>
+          </IonBadge>
           <IonButtons slot="end">
             <IonButton id="details-open-popover-menu">
               <IonIcon slot="icon-only" ios={ellipsisHorizontal} md={ellipsisVertical} />

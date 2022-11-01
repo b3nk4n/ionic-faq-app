@@ -9,7 +9,7 @@ import {
   Unsubscribe,
   updateDoc,
 } from "firebase/firestore";
-import { db, resetAllPublicUpvotes } from "../firebaseConfig";
+import { db, resetAllPublicUpvotes, upvoteEntry } from "../firebaseConfig";
 import { Entry, EntryData } from "../types/model";
 import { toEntry } from "../types/mapper";
 
@@ -153,7 +153,6 @@ export async function updateEntry(title: string, content: string, id: string, us
   await updateDoc(docRef, {
     title,
     content,
-    upvotes: 0,
   });
 }
 
@@ -184,5 +183,16 @@ export async function resetAllUsersPublicUpvotes(): Promise<void> {
     await resetAllPublicUpvotes();
   } catch (error) {
     console.log({ error });
+  }
+}
+
+export async function upvote(id: string): Promise<boolean> {
+  try {
+    await upvoteEntry({
+      id,
+    });
+    return true;
+  } catch (error) {
+    return false;
   }
 }
