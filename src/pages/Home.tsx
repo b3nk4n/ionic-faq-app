@@ -77,7 +77,7 @@ const Home: React.FC = () => {
   };
 
   const handleLike = async (id: string) => {
-    const success = upvote(id);
+    const success = await upvote(id);
 
     if (!success) {
       showToast("You already upvoted on this entry.", 3000);
