@@ -96,3 +96,16 @@ export const upvoteEntry = functions.https.onCall(async (data, context) => {
     );
   }
 });
+
+export const publicEntryActivities = functions.firestore.document("/entries/{id}")
+    .onCreate(async (_, context) => {
+      const { id } = context.params;
+      const userId = context.auth?.uid;
+
+      await admin.firestore()
+          .collection("activities")
+          .add({
+            msg: `A new public entry was created with id ${id} by user ${userId}`,
+            ts: Date.now(),
+          });
+    });
