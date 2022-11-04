@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
   IonBadge,
@@ -49,6 +49,7 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [segmentValue, setSegmentValue] = useState<SegmentValue>("public");
   const [showToast] = useIonToast();
+  const slidingListRef = useRef<HTMLIonListElement | null>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -77,6 +78,8 @@ const Home: React.FC = () => {
   };
 
   const handleLike = async (id: string) => {
+    await slidingListRef.current?.closeSlidingItems();
+
     const success = await upvote(id);
 
     if (!success) {
@@ -85,6 +88,8 @@ const Home: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
+    await slidingListRef.current?.closeSlidingItems();
+
     if (segmentValue === "public") {
       await deletePublicEntry(id);
     } else if (segmentValue === "private" && userId) {
@@ -104,6 +109,8 @@ const Home: React.FC = () => {
       // https://firebase.google.com/docs/auth/web/manage-users#re-authenticate_a_user
       console.log({ error });
     }
+
+    await slidingListRef.current?.closeSlidingItems();
   };
 
   const handleResetAllPublicLikes = async () => {
@@ -161,11 +168,11 @@ const Home: React.FC = () => {
           </IonSegmentButton>
         </IonSegment>
 
-        <IonList>
+        <IonList ref={slidingListRef}>
           {entries.map((entry) => (
             <IonItemSliding key={entry.id}>
-              <IonItemOptions side="start">
-                <IonItemOption color="secondary" onClick={() => handleLike(entry.id)}>
+              <IonItemOptions side="start" onIonSwipe={() => handleLike(entry.id)}>
+                <IonItemOption color="secondary" onClick={() => handleLike(entry.id)} expandable>
                   <IonIcon slot="start" icon={heart} />
                   Like
                 </IonItemOption>
@@ -184,8 +191,8 @@ const Home: React.FC = () => {
                 </IonBadge>
               </IonItem>
 
-              <IonItemOptions side="end">
-                <IonItemOption color="danger" onClick={() => handleDelete(entry.id)}>
+              <IonItemOptions side="end" onIonSwipe={() => handleDelete(entry.id)}>
+                <IonItemOption color="danger" onClick={() => handleDelete(entry.id)} expandable>
                   <IonIcon slot="start" icon={trash} />
                   Delete
                 </IonItemOption>
