@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ionic-faq-app</string>
+    <string name="title_activity_main">ionic-faq-app</string>
+    <string name="package_name">de.b3nk4n.faqapp</string>
+    <string name="custom_url_scheme">de.b3nk4n.faqapp</string>
+</resources>

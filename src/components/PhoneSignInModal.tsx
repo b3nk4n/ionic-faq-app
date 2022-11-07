@@ -30,7 +30,7 @@ declare global {
 }
 
 // @eslint-disable no-unused-var
-const PhoneSignInModal = ({ isOpen, onCancel, onLoginSuccess }: Props) => {
+const PhoneSignInModal: React.FC<Props> = ({ isOpen, onCancel, onLoginSuccess }: Props) => {
   const [phoneNumber, setPhoneNumber] = useState<string>();
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
   const [code, setCode] = useState<string>();
