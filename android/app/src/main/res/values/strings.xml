@@ -4,4 +4,5 @@
     <string name="title_activity_main">ionic-faq-app</string>
     <string name="package_name">de.b3nk4n.faqapp</string>
     <string name="custom_url_scheme">de.b3nk4n.faqapp</string>
+    <string name="default_notification_channel_id">default_channel</string>
 </resources>

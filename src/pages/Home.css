@@ -1,4 +1,14 @@
-.badge-icon {
+.badge-like-icon {
     margin-bottom: -0.1rem;
     margin-right: 0.25rem;
+}
+
+.badge-notification-icon {
+    margin-bottom: -0.15rem;
+    margin-right: 0.25rem;
+    font-size: 16pt;
+}
+
+.badge-notification-text {
+    font-size: 16pt;
 }

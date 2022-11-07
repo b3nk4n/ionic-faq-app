@@ -33,8 +33,16 @@ import {
   resetAllUsersPublicUpvotes,
   upvote,
 } from "../utils/firebaseUtils";
-import { add, ellipsisHorizontal, ellipsisVertical, heart, trash } from "ionicons/icons";
+import {
+  add,
+  ellipsisHorizontal,
+  ellipsisVertical,
+  heart,
+  trash,
+  notifications as notificationsIcon,
+} from "ionicons/icons";
 import { deleteUser, GoogleAuthProvider, linkWithRedirect } from "firebase/auth";
+import { useMobilePushNotifications } from "../hooks/useMobilePushNotifications";
 import { useAuth } from "../context/auth";
 import { auth } from "../firebaseConfig";
 import { Entry } from "../types/model";
@@ -50,6 +58,7 @@ const Home: React.FC = () => {
   const [segmentValue, setSegmentValue] = useState<SegmentValue>("public");
   const [showToast] = useIonToast();
   const slidingListRef = useRef<HTMLIonListElement | null>(null);
+  const { notifications } = useMobilePushNotifications();
 
   useEffect(() => {
     setLoading(true);
@@ -119,11 +128,18 @@ const Home: React.FC = () => {
     await resetAllUsersPublicUpvotes();
   };
 
+  const notificationsCount = notifications?.length ?? 0;
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar color="primary">
           <IonTitle>Home</IonTitle>
+          {notificationsCount > 0 && (
+            <IonBadge slot="end" color="danger">
+              <IonIcon className="badge-notification-icon" icon={notificationsIcon} />
+              <IonLabel className="badge-notification-text">{notificationsCount}</IonLabel>
+            </IonBadge>
+          )}
           {loading && <IonProgressBar type="indeterminate" color="light"></IonProgressBar>}
           <IonButtons slot="end">
             {/* Note that the ID needs to be unique across pages, otherwise a wrong popover might be triggered.*/}
@@ -186,7 +202,7 @@ const Home: React.FC = () => {
                   </p>
                 </IonText>
                 <IonBadge slot="end" color="secondary">
-                  <IonIcon className="badge-icon" icon={heart} />
+                  <IonIcon className="badge-like-icon" icon={heart} />
                   {entry.upvotes}
                 </IonBadge>
               </IonItem>
