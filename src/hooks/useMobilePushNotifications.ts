@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 
 import { PushNotificationSchema, PushNotifications, Token, ActionPerformed } from "@capacitor/push-notifications";
-import { Toast } from "@capacitor/toast";
 import { Capacitor } from "@capacitor/core";
+import { Toast } from "@capacitor/toast";
 
 export interface MobileNotification {
   id: string;
