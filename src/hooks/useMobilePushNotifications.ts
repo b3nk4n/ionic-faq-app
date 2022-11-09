@@ -31,7 +31,6 @@ export const useMobilePushNotifications = () => {
     };
   }
 
-
   const register = () => {
     console.log("Registering push notifications...");
 

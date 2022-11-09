@@ -22,6 +22,6 @@
   },
   "include": [
     "src",
-    "public/firebase-messaging-sw.js"
+    "src/firebase-messaging-sw.js"
   ]
 }

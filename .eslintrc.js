@@ -23,7 +23,8 @@ module.exports = {
     "/src/reportWebVitals.ts",
     "/src/setupTests.ts",
     "/build/**/*",
-    "/public/firebase-messaging-sw.js",
+    "/src/firebase-messaging-sw.js",
+    "/public/*",
   ],
   plugins: [
     "@typescript-eslint",

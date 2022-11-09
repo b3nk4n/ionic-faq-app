@@ -30,3 +30,6 @@ yarn-error.log*
 # Firebase
 .firebase/
 .env
+
+# files generated via webpack / cra-append-sw
+public/*.js

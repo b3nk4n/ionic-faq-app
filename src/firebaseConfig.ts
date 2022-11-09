@@ -73,7 +73,7 @@ export const deleteMessagingToken = async () => {
 
 if ("serviceWorker" in navigator) { // TODO add permission check as above, and move to a hook?
   const swUrl = `${process.env.PUBLIC_URL}/firebase-messaging-sw.js`;
-  console.log("Navigator is service worker");
+
   navigator.serviceWorker.register(swUrl)
       .then((registration) => {
         console.log("Registration successful, scope is:", registration);
