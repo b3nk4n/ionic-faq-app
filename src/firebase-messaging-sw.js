@@ -2,8 +2,8 @@
  * Read for further deatils:
  * - https://github.com/firebase/firebase-js-sdk/issues/5732
  */
-importScripts("https://www.gstatic.com/firebasejs/9.11.0/firebase-app-compat.js");
-importScripts("https://www.gstatic.com/firebasejs/9.11.0/firebase-messaging-compat.js");
+importScripts("https://www.gstatic.com/firebasejs/9.12.0/firebase-app-compat.js");
+importScripts("https://www.gstatic.com/firebasejs/9.12.0/firebase-messaging-compat.js");
 
 self.addEventListener("notificationclick", (event) => {
   console.log("[firebase-messaging-sw.js] Notification clicked ", event);
