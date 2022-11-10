@@ -41,6 +41,7 @@ import {
   trash,
   notifications as notificationsIcon,
 } from "ionicons/icons";
+import { useWebPushNotifications, hasNotificationPermission } from "../hooks/useWebPushNotifications";
 import { deleteUser, GoogleAuthProvider, linkWithRedirect } from "firebase/auth";
 import { useMobilePushNotifications } from "../hooks/useMobilePushNotifications";
 import { useAuth } from "../context/auth";
@@ -59,6 +60,7 @@ const Home: React.FC = () => {
   const [showToast] = useIonToast();
   const slidingListRef = useRef<HTMLIonListElement | null>(null);
   const { notifications } = useMobilePushNotifications();
+  const { token, deleteMessagingToken, manuallyRequestNotificationPermissions } = useWebPushNotifications();
 
   useEffect(() => {
     setLoading(true);
@@ -129,6 +131,7 @@ const Home: React.FC = () => {
   };
 
   const notificationsCount = notifications?.length ?? 0;
+  const hasWebNotificationPermissions = hasNotificationPermission();
   return (
     <IonPage>
       <IonHeader>
@@ -157,6 +160,16 @@ const Home: React.FC = () => {
                   {anonymous && (
                     <IonItem button detail={false} onClick={continueAsGoogle}>
                       Continue via Google Login
+                    </IonItem>
+                  )}
+                  {!hasWebNotificationPermissions && (
+                    <IonItem button detail={false} onClick={() => manuallyRequestNotificationPermissions()}>
+                      Request Web Notification Permissions
+                    </IonItem>
+                  )}
+                  {token && (
+                    <IonItem button detail={false} onClick={() => deleteMessagingToken()}>
+                      Delete Messaging Token
                     </IonItem>
                   )}
                   <IonItem button detail={false} onClick={() => auth.signOut()}>

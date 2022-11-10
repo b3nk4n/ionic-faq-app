@@ -11,6 +11,10 @@ export interface MobileNotification {
   type: "foreground" | "action";
 }
 
+interface MobileNotificationsResult {
+  notifications: MobileNotification[];
+}
+
 const emptyNotifications: MobileNotification[] = [];
 
 /**
@@ -20,15 +24,15 @@ const emptyNotifications: MobileNotification[] = [];
  * or generating a Push Certificate for iOS, check out the following post:
  * https://enappd.com/blog/firebase-push-notification-in-ionic-react-capacitor/111/
  *
- * @return {MobileNotification[]} The received mobile notifications of the current session.
+ * @return {MobileNotificationsResult} The received mobile notifications of the current session.
  */
-export const useMobilePushNotifications = () => {
+export const useMobilePushNotifications = (): MobileNotificationsResult => {
   const [notifications, setNotifications] = useState<MobileNotification[]>(emptyNotifications);
 
   if (!Capacitor.isPluginAvailable("PushNotifications")) {
     return {
       notifications: emptyNotifications,
-    };
+    } as MobileNotificationsResult;
   }
 
   const register = () => {
@@ -105,5 +109,5 @@ export const useMobilePushNotifications = () => {
 
   return {
     notifications,
-  };
+  } as MobileNotificationsResult;
 };
