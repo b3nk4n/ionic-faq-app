@@ -44,6 +44,7 @@ import {
 import { useWebPushNotifications, hasNotificationPermission } from "../hooks/useWebPushNotifications";
 import { deleteUser, GoogleAuthProvider, linkWithRedirect } from "firebase/auth";
 import { useMobilePushNotifications } from "../hooks/useMobilePushNotifications";
+import { Clipboard } from "@capacitor/clipboard";
 import { useAuth } from "../context/auth";
 import { auth } from "../firebaseConfig";
 import { Entry } from "../types/model";
@@ -130,6 +131,18 @@ const Home: React.FC = () => {
     await resetAllUsersPublicUpvotes();
   };
 
+  const handleCopyMessagingTokenToClipboard = async () => {
+    if (!token) {
+      return;
+    }
+
+    await Clipboard.write({
+      string: token,
+    });
+
+    showToast("Copied token to clipboard.", 3000);
+  };
+
   const notificationsCount = notifications?.length ?? 0;
   const hasWebNotificationPermissions = hasNotificationPermission();
   return (
@@ -170,6 +183,11 @@ const Home: React.FC = () => {
                   {token && (
                     <IonItem button detail={false} onClick={() => deleteMessagingToken()}>
                       Delete Messaging Token
+                    </IonItem>
+                  )}
+                  {token && (
+                    <IonItem button detail={false} onClick={handleCopyMessagingTokenToClipboard}>
+                      Copy Messaging Token
                     </IonItem>
                   )}
                   <IonItem button detail={false} onClick={() => auth.signOut()}>
