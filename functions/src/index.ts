@@ -1,21 +1,11 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import { Message } from "firebase-admin/lib/messaging/messaging-api";
 
 // Start writing Firebase Functions
 // https://firebase.google.com/docs/functions/typescript
 
 admin.initializeApp();
-
-export const helloWorld = functions.https.onRequest((request, response) => {
-  functions.logger.info("Hello logs!", {
-    structuredData: true,
-  });
-  response.send("Hello from Firebase!");
-});
-
-export const helloCaller = functions.https.onCall(() => {
-  return "Hi from Firebase!";
-});
 
 export const userCreated = functions.auth.user().onCreate(async (user) => {
   functions.logger.info("User created", {
@@ -109,3 +99,70 @@ export const publicEntryActivities = functions.firestore.document("/entries/{id}
             ts: Date.now(),
           });
     });
+
+export const sendDataPushNotification = functions.https.onRequest(async (request, response) => {
+  const token = request.query.token as string;
+
+  if (!token) {
+    throw new functions.https.HttpsError(
+        "failed-precondition",
+        "User device token is required provided as token query parameter."
+    );
+  }
+
+  const payload = {
+    token,
+    data: {
+      title: "Hello world",
+      body: "Sent via cloud function",
+    },
+  };
+
+  const messageId = await admin.messaging().send(payload);
+
+  response.status(200).send({
+    message: "Push notification sent successfully.",
+    data: {
+      messageId,
+      payload,
+    },
+  });
+});
+
+export const sendSimplePushNotification = functions.https.onRequest(async (request, response) => {
+  const token = request.query.token as string;
+
+  if (!token) {
+    throw new functions.https.HttpsError(
+        "failed-precondition",
+        "User device token is required provided as token query parameter."
+    );
+  }
+
+  const payload = {
+    token,
+    notification: {
+      title: "Feeling puzzled?",
+      body: "Simply ask a question...",
+    },
+    webpush: {
+      notification: {
+        title: "WebPush title",
+        body: "WebPush body",
+      },
+      fcmOptions: {
+        link: `https://${process.env.GCLOUD_PROJECT}.web.app/entry/new`,
+      },
+    },
+  } as Message;
+
+  const messageId = await admin.messaging().send(payload);
+
+  response.status(200).send({
+    message: "Push notification sent successfully.",
+    data: {
+      messageId,
+      payload,
+    },
+  });
+});

@@ -7,6 +7,23 @@ importScripts("https://www.gstatic.com/firebasejs/9.12.0/firebase-messaging-comp
 
 self.addEventListener("notificationclick", (event) => {
   console.log("[firebase-messaging-sw.js] Notification clicked ", event);
+
+  event.notification.close();
+
+  if (event.action === "new") {
+    clients.openWindow("/entry/new");
+    return;
+  }
+
+  // user clicks main body of the notification
+  const clickAction = event.notification.data["FCM_MSG"].notification["click_action"];
+  if (clickAction) {
+    // somehow it seems we need to handle this manually here, when such a click action is set in the notification
+    clients.openWindow(clickAction);
+  }
+
+  // open the home page by default
+  clients.openWindow("/");
 });
 
 self.addEventListener("notificationclose", (event) => {
@@ -29,12 +46,23 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
   console.log("[firebase-messaging-sw.js] Received background message ", payload);
   
-  // Customize notification here, which is redundant when sent with notification fields,
-  // but not when data fields are used instead.
-  const notificationTitle = "Background Message Title";
+  if (payload.notification) {
+    // If the notification fields are set, then the browswer is already handling the notification
+    return;
+  }
+
+  const notificationTitle = payload.data.title;
   const notificationOptions = {
-    body: "Background Message body.",
+    body: payload.data.body,
     icon: "/assets/icon/icon-144.png",
+    vibrate: [100, 100, 200, 100, 300, 100, 400],
+    tag: "background-notification",
+    actions: [
+      {
+        action: 'new',
+        title: 'New Entry'
+      }
+    ],
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);
