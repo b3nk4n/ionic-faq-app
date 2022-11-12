@@ -49,8 +49,12 @@ export const useWebPushNotifications = (): WebPushNotificationsResult => {
 
         onMessage(messaging, async (payload) => {
           console.log("Message received in foreground. ", payload);
+
+          const title = payload.notification?.title ?? payload.data?.title;
+          const body = payload.notification?.body ?? payload.data?.body;
+
           await Toast.show({
-            text: payload.notification?.title + " " + payload.notification?.body,
+            text: title + " " + body,
           });
         });
       }
