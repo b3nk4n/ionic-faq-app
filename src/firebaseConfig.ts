@@ -24,4 +24,12 @@ const functions = getFunctions();
 export const resetAllPublicUpvotes = httpsCallable(functions, "resetAllPublicUpvotes");
 export const upvoteEntry = httpsCallable(functions, "upvoteEntry");
 
+interface TokenRequest {
+  token: string;
+}
+
+export const subscribeToNotifications = httpsCallable<TokenRequest, boolean>(functions, "subscribeToNotifications");
+export const unsubscribeFromNotifications = httpsCallable<TokenRequest, boolean>(
+    functions, "unsubscribeFromNotifications");
+
 export const messaging = getMessaging(app);

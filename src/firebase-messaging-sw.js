@@ -2,8 +2,9 @@
  * Read for further deatils:
  * - https://github.com/firebase/firebase-js-sdk/issues/5732
  */
-importScripts("https://www.gstatic.com/firebasejs/9.12.0/firebase-app-compat.js");
-importScripts("https://www.gstatic.com/firebasejs/9.12.0/firebase-messaging-compat.js");
+importScripts("https://www.gstatic.com/firebasejs/9.14.0/firebase-app-compat.js");
+importScripts("https://www.gstatic.com/firebasejs/9.14.0/firebase-auth-compat.js");
+importScripts("https://www.gstatic.com/firebasejs/9.14.0/firebase-messaging-compat.js");
 
 self.addEventListener("notificationclick", (event) => {
   console.log("[firebase-messaging-sw.js] Notification clicked ", event);
@@ -50,6 +51,16 @@ messaging.onBackgroundMessage((payload) => {
     // If the notification fields are set, then the browswer is already handling the notification
     return;
   }
+
+  // The userId is (not yet) attached, because this requires a workaround via the
+  // payload or path. For now, we assume that such notifications don't need to be filtered
+  // out manually, because a user that created an entry should anyways only get a foreground
+  // notification. And this is fine for now in this demo application.
+  // const auth = app.auth();
+  // if (payload.data.userId === auth.currentUser.uid) {
+  //   console.log("Suppressing own notification");
+  //   return;
+  // }
 
   const notificationTitle = payload.data.title;
   const notificationOptions = {

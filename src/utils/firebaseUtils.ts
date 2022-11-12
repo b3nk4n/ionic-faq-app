@@ -9,7 +9,7 @@ import {
   Unsubscribe,
   updateDoc,
 } from "firebase/firestore";
-import { db, resetAllPublicUpvotes, upvoteEntry } from "../firebaseConfig";
+import { db, resetAllPublicUpvotes, upvoteEntry, subscribeToNotifications } from "../firebaseConfig";
 import { Entry, EntryData } from "../types/model";
 import { toEntry } from "../types/mapper";
 
@@ -186,12 +186,33 @@ export async function resetAllUsersPublicUpvotes(): Promise<void> {
   }
 }
 
+/**
+ * Upvote an entry by ID.
+ * @param {string} id The entry ID.
+ * @return {Promise<boolean>} True if the upvote was successful.
+ */
 export async function upvote(id: string): Promise<boolean> {
   try {
     await upvoteEntry({
       id,
     });
     return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+/**
+ * Subscribes to notification when a new public entry is written.
+ * @param {string} token The registration token.
+ * @return {Promise<boolean>} True if subscribed successful.
+ */
+export async function subscribeToNewEntries(token: string): Promise<boolean> {
+  try {
+    const result = await subscribeToNotifications({
+      token,
+    });
+    return result.data;
   } catch (error) {
     return false;
   }

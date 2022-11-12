@@ -5,6 +5,7 @@ import { isPlatform } from "@ionic/react";
 import { Toast } from "@capacitor/toast";
 
 import { messaging } from "../firebaseConfig";
+import { subscribeToNewEntries } from "../utils/firebaseUtils";
 
 interface WebPushNotificationsResult {
   token: string | null;
@@ -38,7 +39,13 @@ export const useWebPushNotifications = (): WebPushNotificationsResult => {
     const init = async () => {
       const success = await registerServiceWorker();
       if (success) {
-        requestMessagingToken(setToken);
+        requestMessagingToken(async (token) => {
+          setToken(token);
+          if (token) {
+            const result = await subscribeToNewEntries(token);
+            console.log("Subscribed to new entries", result);
+          }
+        });
 
         onMessage(messaging, async (payload) => {
           console.log("Message received in foreground. ", payload);
