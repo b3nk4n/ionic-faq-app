@@ -5,7 +5,7 @@
   "icons": [
     {
       "src": "assets/icon/favicon.png",
-      "sizes": "64x64 32x32 24x24 16x16",
+      "sizes": "64x64",
       "type": "image/x-icon"
     },
     {
@@ -21,8 +21,30 @@
       "purpose": "maskable"
     }
   ],
+  "id": ".",
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#8800d1",
-  "background_color": "#ffffff"
+  "background_color": "#ffffff",
+  "shortcuts": [
+    {
+      "name": "New question",
+      "short_name": "New",
+      "description": "Ask a new question to the public",
+      "url": "/entry/new",
+      "icons": [{ "src": "assets/icon/icon-144.png", "sizes": "144x144" }]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "assets/image/screenshot1.png",
+      "type": "image/png",
+      "sizes": "393x851"
+    },
+    {
+      "src": "assets/image/screenshot2.png",
+      "type": "image/png",
+      "sizes": "393x851"
+    }
+  ]
 }
