@@ -43,7 +43,7 @@ import {
 } from "ionicons/icons";
 import { useWebPushNotifications, hasNotificationPermission } from "../hooks/useWebPushNotifications";
 import { deleteUser, GoogleAuthProvider, linkWithRedirect } from "firebase/auth";
-import { useMobilePushNotifications } from "../hooks/useMobilePushNotifications";
+// import { useMobilePushNotifications } from "../hooks/useMobilePushNotifications";
 import { Clipboard } from "@capacitor/clipboard";
 import { useAuth } from "../context/auth";
 import { auth } from "../firebaseConfig";
@@ -60,7 +60,7 @@ const Home: React.FC = () => {
   const [segmentValue, setSegmentValue] = useState<SegmentValue>("public");
   const [showToast] = useIonToast();
   const slidingListRef = useRef<HTMLIonListElement | null>(null);
-  const { notifications } = useMobilePushNotifications();
+  // const { notifications } = useMobilePushNotifications();
   const { token, deleteMessagingToken, manuallyRequestNotificationPermissions } = useWebPushNotifications();
 
   useEffect(() => {
@@ -143,7 +143,7 @@ const Home: React.FC = () => {
     showToast("Copied token to clipboard.", 3000);
   };
 
-  const notificationsCount = notifications?.length ?? 0;
+  const notificationsCount = 0;// notifications?.length ?? 0;
   const hasWebNotificationPermissions = hasNotificationPermission();
   return (
     <IonPage>
