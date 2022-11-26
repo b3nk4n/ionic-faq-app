@@ -71,5 +71,6 @@ The production build created in the `build` folder can then be deployed, such as
 firebase deploy
 firebase deploy --only hosting
 firebase deploy --only functions
+firebase deploy --only firestore:rules
 firebase deploy --only hosting,functions
 ```

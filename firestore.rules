@@ -1,0 +1,37 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isNotBlank(value) {
+      return value != null && value != '';
+    }
+
+    function hasValidEntry() {
+      return isNotBlank(request.resource.data.title) && isNotBlank(request.resource.data.content);
+    }
+
+    match /entries/{entryId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && hasValidEntry();
+    }
+
+    match /users/{userId}/entries/{entryId} {
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      allow write: if isAuthenticated()  && hasValidEntry() && request.auth.uid == userId;
+    }
+
+    // match /{document=**} {
+    //   allow read, write: if true;
+
+    //   // Example: only admin user can delete
+    //   function isAdminUser() {
+    //     return if isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.admin == true;
+    //   }
+    //   allow delete: isAdminUser();
+    // }
+  }
+}
