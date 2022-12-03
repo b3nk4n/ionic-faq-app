@@ -1,5 +1,5 @@
 import { getFunctions, httpsCallable } from "firebase/functions";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, enableIndexedDbPersistence } from "firebase/firestore";
 import { getMessaging } from "firebase/messaging";
 import { getAnalytics } from "firebase/analytics";
 import { initializeApp } from "firebase/app";
@@ -18,6 +18,24 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+if (process.env.REACT_APP_FIREBASE_OFFLINE_MODE === "true") {
+  enableIndexedDbPersistence(db)
+      .then(() => console.log("Enabled offline persistence"))
+      .catch((error) => {
+        console.warn("Enabling offline persistence failed.", error);
+        if (error.code == "failed-precondition") {
+          // Multiple tabs open, persistence can only be enabled
+          // in one tab at a a time.
+          // ...
+        } else if (error.code == "unimplemented") {
+          // The current browser does not support all of the
+          // features required to enable persistence
+          // ...
+        }
+      });
+}
+
 export const analytics = getAnalytics(app);
 
 const functions = getFunctions();

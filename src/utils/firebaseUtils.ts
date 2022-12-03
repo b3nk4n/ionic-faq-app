@@ -23,6 +23,9 @@ export async function createEntry(title: string, content: string, userId?: strin
   const collRef = userId ?
     collection(db, "users", userId, "entries") :
     collection(db, "entries");
+
+  // Please note that the promise does not resolve in OFFLINE mode, as described here:
+  // https://github.com/firebase/firebase-js-sdk/issues/6515
   await addDoc(collRef, {
     title,
     content,
