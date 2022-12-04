@@ -36,31 +36,42 @@ export const useWebPushNotifications = (): WebPushNotificationsResult => {
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const init = async () => {
-      const success = await registerServiceWorker();
-      if (success) {
-        requestMessagingToken(async (token) => {
-          setToken(token);
-          if (token) {
-            const result = await subscribeToNewEntries(token);
-            console.log("Subscribed to new entries", result);
-          }
-        });
-
-        onMessage(messaging, async (payload) => {
-          console.log("Message received in foreground. ", payload);
-
-          const title = payload.notification?.title ?? payload.data?.title;
-          const body = payload.notification?.body ?? payload.data?.body;
-
-          await Toast.show({
-            text: title + " " + body,
-          });
-        });
+    /**
+     * Init push notifications service worker and handlers.
+     * @param {boolean} useCustomServiceWorkerRegistration Whether to use a custom service worker registration,
+     *                                                     or the default created by Firebase out of the box.
+     */
+    const init = async (useCustomServiceWorkerRegistration: boolean) => {
+      const registration = undefined;
+      if (useCustomServiceWorkerRegistration) {
+        const registration = await registerServiceWorker();
+        if (registration == null) {
+          console.warn("Custom service worker registration failed.");
+          return;
+        }
       }
+
+      requestMessagingToken(async (token) => {
+        setToken(token);
+        if (token) {
+          const result = await subscribeToNewEntries(token);
+          console.log("Subscribed to new entries", result);
+        }
+      }, registration);
+
+      onMessage(messaging, async (payload) => {
+        console.log("Message received in foreground. ", payload);
+
+        const title = payload.notification?.title ?? payload.data?.title;
+        const body = payload.notification?.body ?? payload.data?.body;
+
+        await Toast.show({
+          text: title + " " + body,
+        });
+      });
     };
 
-    init();
+    init(false);
   }, []);
 
   return {
@@ -72,24 +83,28 @@ export const useWebPushNotifications = (): WebPushNotificationsResult => {
   } as WebPushNotificationsResult;
 };
 
-const registerServiceWorker = async (): Promise<boolean> => {
+const registerServiceWorker = async (): Promise<ServiceWorkerRegistration | null> => {
   if ("serviceWorker" in navigator) {
     const swUrl = `${process.env.PUBLIC_URL}/firebase-messaging-sw.js`;
 
     try {
-      const registration = await navigator.serviceWorker.register(swUrl);
-      console.log("Registration successful, scope is:", registration);
-      return true;
+      // give the service worker a pseudo scope, to not clash or replace our service-worker.js
+      // that is running in root ("/") scope
+      const registration = await navigator.serviceWorker.register(swUrl, { scope: "/firebase/" });
+      console.log("Web push service worker registration successful, scope is:", registration);
+      return registration;
     } catch (error) {
-      console.log("Service worker registration failed, error:", error);
+      console.log("Web push service worker registration failed, error:", error);
     }
   }
-  return false;
+  return null;
 };
-const requestMessagingToken = (onToken: (token: string) => void): void => {
+const requestMessagingToken = (onToken: (token: string) => void, registration?: ServiceWorkerRegistration): void => {
   // internally ask for notification permissions and get a token if allowed and not blocked
   getToken(messaging, {
     vapidKey: process.env.REACT_APP_FIREBASE_CLOUD_MSG_VAPID_KEY,
+    // if not defined, a registration with scope named "/firebase-cloud-messaging-push-scope" is automatically created
+    serviceWorkerRegistration: registration,
   })
       .then((currentToken) => {
         if (currentToken) {
@@ -142,7 +157,8 @@ const requestNotificationPermission = async (onToken: (token: string) => void) =
   if (permission === "granted") {
     console.log("Notification permission granted.");
 
-    requestMessagingToken(onToken);
+    // Note that this assumes that we use the default SW registration by Firebase
+    requestMessagingToken(onToken, undefined);
   } else {
     console.log("Unable to get permission to notify.");
   }

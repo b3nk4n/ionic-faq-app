@@ -32,7 +32,17 @@ self.addEventListener("notificationclose", (event) => {
 });
 
 const firebaseConfig = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  // The apiKey can be hidden in different ways, such as:
+  // - Using cra-append-sw tool: https://dev.to/3dayweek/the-easiest-way-to-extend-create-react-app-service-worker-without-ejecting-bfg
+  //   - This is however not recommended anymore, and was initially only needed when CRA (create react app)
+  //     did not make it easy to modify the (internal) SW code. Since CRA 4, this is however simplified via the
+  //     generated service-worker.ts file.
+  // - There are workarounds to pass it via URL query parameter when registering the service worker
+  // - The API key is not considered "private" in Firebase, but just to identify the backend. See for more details:
+  //   https://stackoverflow.com/questions/37482366/is-it-safe-to-expose-firebase-apikey-to-the-public
+  // Consequently, we will simply not bother with "not exposing" the API key for this demo project.
+  // apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  apiKey: "AIzaSyCB0jCnxXWK8N7uKIYVcKEBMKuKX3Kkxyc",
   authDomain: "ionic-faq-app.firebaseapp.com",
   projectId: "ionic-faq-app",
   storageBucket: "ionic-faq-app.appspot.com",

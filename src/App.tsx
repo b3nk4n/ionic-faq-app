@@ -9,6 +9,7 @@ import EditEntry from "./pages/EditEntry";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
+import Debug from "./pages/Debug";
 import Home from "./pages/Home";
 
 /* Core CSS required for Ionic components to work properly */
@@ -80,6 +81,9 @@ const App: React.FC = () => {
             </Route>
             <Route exact path="/users/:userId/entry/new">
               {loggedIn ? <EditEntry /> : <Redirect to="/login" />}
+            </Route>
+            <Route exact path="/debug">
+              {loggedIn ? <Debug /> : <Redirect to="/login" />}
             </Route>
             <Route exact path="/">
               <Redirect to="/home" />

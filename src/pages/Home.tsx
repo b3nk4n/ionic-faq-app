@@ -198,6 +198,11 @@ const Home: React.FC = () => {
                       Delete account
                     </IonItem>
                   )}
+                  {process.env.REACT_APP_DEBUG_MODE === "true" && (
+                    <IonItem button detail={false} routerLink="/debug">
+                      Debug
+                    </IonItem>
+                  )}
                 </IonList>
               </IonContent>
             </IonPopover>
