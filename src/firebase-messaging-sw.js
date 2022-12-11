@@ -41,6 +41,8 @@ const firebaseConfig = {
   // - The API key is not considered "private" in Firebase, but just to identify the backend. See for more details:
   //   https://stackoverflow.com/questions/37482366/is-it-safe-to-expose-firebase-apikey-to-the-public
   // Consequently, we will simply not bother with "not exposing" the API key for this demo project.
+  // However, you might receive an email about "Publicly accessible Google API key for Google Cloud Platform project <App Name> (id: <AppId>)",
+  // if you don't restrict the API Key to a specific web/mobile application, or to only a subset of the APIs.
   // apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
   apiKey: "AIzaSyCB0jCnxXWK8N7uKIYVcKEBMKuKX3Kkxyc",
   authDomain: "ionic-faq-app.firebaseapp.com",
