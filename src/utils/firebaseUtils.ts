@@ -6,6 +6,8 @@ import {
   getDoc,
   getDocs,
   onSnapshot,
+  orderBy,
+  query,
   Unsubscribe,
   updateDoc,
 } from "firebase/firestore";
@@ -65,7 +67,8 @@ export async function fetchPrivateEntries(userId: string): Promise<Entry[]> {
  */
 export function onPublicEntriesUpdated(callback: (entries: Entry[]) => void): Unsubscribe {
   const collRef = collection(db, "entries");
-  return onSnapshot(collRef, (snapshot) => {
+  const entriesQuery = query(collRef, orderBy("upvotes", "desc"));
+  return onSnapshot(entriesQuery, (snapshot) => {
     const entries = snapshot.docs.map(toEntry);
     callback(entries);
   });
@@ -79,7 +82,8 @@ export function onPublicEntriesUpdated(callback: (entries: Entry[]) => void): Un
  */
 export function onPrivateEntriesUpdated(userId: string, callback: (entries: Entry[]) => void): Unsubscribe {
   const collRef = collection(db, "users", userId, "entries");
-  return onSnapshot(collRef, (snapshot) => {
+  const entriesQuery = query(collRef, orderBy("upvotes", "desc"));
+  return onSnapshot(entriesQuery, (snapshot) => {
     const entries = snapshot.docs.map(toEntry);
     callback(entries);
   });
