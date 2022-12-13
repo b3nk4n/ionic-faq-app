@@ -4,8 +4,16 @@ import { deleteToken, getToken, onMessage } from "firebase/messaging";
 import { isPlatform } from "@ionic/react";
 import { Toast } from "@capacitor/toast";
 
-import { messaging } from "../firebaseConfig";
 import { subscribeToNewEntries } from "../utils/firebaseUtils";
+import { messaging } from "../firebaseConfig";
+import { useStorage } from "./useStorage";
+
+/**
+ * Update the registration token and notification subscription at most once a day.
+ * Usually, even once a week should be sufficient.
+ * From Firebase docs, at least once every second week is recommended.
+ */
+const TOKEN_UPDATE_INTERVAL_MILLIS = 26 * 60 * 60 * 1000; // 1 day
 
 interface WebPushNotificationsResult {
   token: string | null;
@@ -34,6 +42,7 @@ export const useWebPushNotifications = (): WebPushNotificationsResult => {
   }
 
   const [token, setToken] = useState<string | null>(null);
+  const tokenStore = useStorage();
 
   useEffect(() => {
     /**
@@ -53,9 +62,22 @@ export const useWebPushNotifications = (): WebPushNotificationsResult => {
 
       requestMessagingToken(async (token) => {
         setToken(token);
-        if (token) {
-          const result = await subscribeToNewEntries(token);
-          console.log("Subscribed to new entries", result);
+
+        if (!token || !tokenStore) {
+          return;
+        }
+
+        const now = new Date().getTime();
+        const tokenTimestamp = await tokenStore.get(token) ?? 0 as number;
+
+        if (now - tokenTimestamp > TOKEN_UPDATE_INTERVAL_MILLIS) {
+          const successResult = await subscribeToNewEntries(token);
+          console.log("Subscribed to new entries", successResult);
+          if (successResult) {
+            await tokenStore.set(token, now);
+          }
+        } else {
+          console.log("Registration token does not need an update yet.");
         }
       }, registration);
 
@@ -71,12 +93,19 @@ export const useWebPushNotifications = (): WebPushNotificationsResult => {
       });
     };
 
+    if (!tokenStore) return;
+
     init(false);
-  }, []);
+  }, [tokenStore]);
 
   return {
     token,
-    deleteMessagingToken,
+    deleteMessagingToken: async () => {
+      if (!token) return;
+
+      await tokenStore?.remove(token);
+      await deleteMessagingRegistrationToken();
+    },
     manuallyRequestNotificationPermissions: async () => {
       await requestNotificationPermission(setToken);
     },
@@ -122,7 +151,7 @@ const requestMessagingToken = (onToken: (token: string) => void, registration?: 
       });
 };
 
-const deleteMessagingToken = async () => {
+const deleteMessagingRegistrationToken = async () => {
   try {
     await deleteToken(messaging);
     console.log("Token deleted.");

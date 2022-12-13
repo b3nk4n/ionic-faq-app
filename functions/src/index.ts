@@ -208,6 +208,9 @@ export const subscribeToNotifications = functions.https.onCall(async (data, cont
     );
   }
 
+  // TODO If the app requires to send a notification directed to a specific user,
+  //      then the token could be persisted as part of the "users" collection.
+
   try {
     const subscribeResponse = await admin.messaging().subscribeToTopic(token, TOPIC);
     functions.logger.warn("Subscribe succeeded", subscribeResponse);

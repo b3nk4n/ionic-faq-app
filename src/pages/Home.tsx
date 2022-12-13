@@ -143,6 +143,13 @@ const Home: React.FC = () => {
     showToast("Copied token to clipboard.", 3000);
   };
 
+  const handleLogout = async () => {
+    // also delete the token to not futher receive any notifications after logout
+    await deleteMessagingToken();
+
+    await auth.signOut();
+  };
+
   const notificationsCount = 0;// notifications?.length ?? 0;
   const hasWebNotificationPermissions = hasNotificationPermission();
   return (
@@ -181,7 +188,7 @@ const Home: React.FC = () => {
                     </IonItem>
                   )}
                   {token && (
-                    <IonItem button detail={false} onClick={() => deleteMessagingToken()}>
+                    <IonItem button detail={false} onClick={async () => await deleteMessagingToken()}>
                       Delete Messaging Token
                     </IonItem>
                   )}
@@ -190,7 +197,7 @@ const Home: React.FC = () => {
                       Copy Messaging Token
                     </IonItem>
                   )}
-                  <IonItem button detail={false} onClick={() => auth.signOut()}>
+                  <IonItem button detail={false} onClick={handleLogout}>
                     Logout
                   </IonItem>
                   {auth.currentUser && (
