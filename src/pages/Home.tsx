@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
+import usePWAInstall from "use-pwa-install";
+
 import {
   IonBadge,
   IonButton,
@@ -62,6 +64,7 @@ const Home: React.FC = () => {
   const slidingListRef = useRef<HTMLIonListElement | null>(null);
   // const { notifications } = useMobilePushNotifications();
   const { token, deleteMessagingToken, manuallyRequestNotificationPermissions } = useWebPushNotifications();
+  const { isInstalled, install } = usePWAInstall();
 
   useEffect(() => {
     setLoading(true);
@@ -208,6 +211,11 @@ const Home: React.FC = () => {
                   {process.env.REACT_APP_DEBUG_MODE === "true" && (
                     <IonItem button detail={false} routerLink="/debug">
                       Debug
+                    </IonItem>
+                  )}
+                  {!isInstalled && (
+                    <IonItem button detail={false} onClick={install}>
+                      Install PWA
                     </IonItem>
                   )}
                 </IonList>
